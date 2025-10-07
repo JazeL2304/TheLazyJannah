@@ -2,31 +2,20 @@ using UnityEngine;
 
 public class DoorInteraction : MonoBehaviour
 {
-    private bool isPlayerInRange = false;
     public Animator doorAnimator;
     public GameObject interactionUI;
 
-    void Update()
-    {
-        // Hanya cek input jika pemain berada di dalam jangkauan
-        if (isPlayerInRange)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                InteractWithDoor(); // Panggil method yang sudah ada
-            }
-        }
-    }
-
-    // METHOD YANG DIPERLUKAN OLEH PLAYERCONTROLLER
+    // PERBAIKAN: Method yang dipanggil dari PlayerController
     public void InteractWithDoor()
     {
         // Periksa status animasi pintu dari parameter Animator
         bool isOpen = doorAnimator.GetBool("IsOpen");
+
         // Ubah status animasi (dari terbuka ke tertutup, dan sebaliknya)
         doorAnimator.SetBool("IsOpen", !isOpen);
+
         // Pesan konfirmasi
-        Debug.Log("Interaksi pintu berhasil dengan tombol E!");
+        Debug.Log("Pintu " + (isOpen ? "ditutup" : "dibuka") + "!");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -34,8 +23,15 @@ public class DoorInteraction : MonoBehaviour
         // Deteksi jika pemain masuk ke area trigger
         if (other.CompareTag("Player"))
         {
-            isPlayerInRange = true;
             Debug.Log("Pemain terdeteksi di dekat pintu!");
+
+            // PERBAIKAN: Beritahu PlayerController bahwa ini pintu aktif
+            PlayerController playerController = other.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetCurrentDoor(this);
+            }
+
             // Tampilkan UI interaksi jika ada
             if (interactionUI != null)
             {
@@ -49,8 +45,15 @@ public class DoorInteraction : MonoBehaviour
         // Deteksi jika pemain keluar dari area trigger
         if (other.CompareTag("Player"))
         {
-            isPlayerInRange = false;
             Debug.Log("Pemain keluar dari area pintu.");
+
+            // PERBAIKAN: Beritahu PlayerController bahwa tidak ada pintu aktif
+            PlayerController playerController = other.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetCurrentDoor(null);
+            }
+
             // Sembunyikan UI interaksi
             if (interactionUI != null)
             {
