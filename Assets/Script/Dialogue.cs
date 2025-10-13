@@ -4,10 +4,16 @@ using TMPro;
 
 public class Dialogue : MonoBehaviour
 {
+    [Header("Text References")]
     public TextMeshProUGUI nameTextComponent;
     public TextMeshProUGUI dialogueTextComponent;
     public GameObject dialogueBox;
 
+    [Header("Audio Settings")]
+    public AudioSource audioSource;
+    public AudioClip clickSound;
+
+    [Header("Dialogue Settings")]
     public DialogueLine[] lines;
     public float textSpeed = 0.05f;
 
@@ -62,6 +68,12 @@ public class Dialogue : MonoBehaviour
             return;
         }
 
+        // AUTO-CREATE AudioSource jika belum ada
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         Debug.Log("Dialog Lines: " + lines.Length + " lines");
 
         dialogueTextComponent.text = string.Empty;
@@ -72,8 +84,17 @@ public class Dialogue : MonoBehaviour
     {
         if (isPaused) return;
 
+        // CEK: Hanya jalankan jika DialogueBox aktif
+        if (dialogueBox != null && !dialogueBox.activeSelf)
+        {
+            return; // DialogueBox tidak aktif, skip
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
+            // PLAY SOUND EFFECT SAAT KLIK! (hanya saat dialog aktif)
+            PlayClickSound();
+
             if (isTyping)
             {
                 StopAllCoroutines();
@@ -85,6 +106,22 @@ public class Dialogue : MonoBehaviour
                 NextLine();
             }
         }
+    }
+
+    // FUNGSI BARU - Play Click Sound
+    void PlayClickSound()
+    {
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.PlayOneShot(clickSound);
+        }
+    }
+
+    // FUNGSI BARU - Cek apakah dialog sedang aktif (untuk blokir player movement)
+    public bool IsDialogueActive()
+    {
+        // Dialog aktif jika DialogueBox terlihat
+        return dialogueBox != null && dialogueBox.activeSelf;
     }
 
     public void StartDialogue()
