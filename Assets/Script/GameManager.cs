@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public GameObject ibuNPC;
     public GameObject bapakNPC;
     public Dialogue dialogueManager;
+    public QuestManager questManager;  // TAMBAHAN BARU
 
     [Header("Post-Choice 2 Settings")]
     public bool showDialogueAfterChoice2 = true;
@@ -38,6 +39,12 @@ public class GameManager : MonoBehaviour
 
         if (ibuNPC != null) ibuNPC.SetActive(false);
         if (bapakNPC != null) bapakNPC.SetActive(false);
+
+        // AUTO-DETECT QUESTMANAGER - TAMBAHAN BARU
+        if (questManager == null)
+        {
+            questManager = FindObjectOfType<QuestManager>();
+        }
 
         Debug.Log("GameManager initialized!");
     }
@@ -155,10 +162,20 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        if (stealthQuestUI != null)
+        // START QUEST VIA QUESTMANAGER - TAMBAHAN BARU
+        if (questManager != null)
         {
-            stealthQuestUI.SetActive(true);
-            Debug.Log("Quest UI ditampilkan");
+            questManager.StartQuest(0);  // Start quest index 0 (MISI STEALTH)
+            Debug.Log("Quest dimulai via QuestManager: MISI STEALTH");
+        }
+        else
+        {
+            // FALLBACK: Tampilkan UI manual jika QuestManager tidak ada
+            if (stealthQuestUI != null)
+            {
+                stealthQuestUI.SetActive(true);
+                Debug.Log("Quest UI ditampilkan (fallback manual)");
+            }
         }
 
         if (ibuNPC != null)

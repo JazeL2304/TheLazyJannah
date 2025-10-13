@@ -718,7 +718,11 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 990387588}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b1b452adf0a1f6049bf4f965bb805caa,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1795185635}
   m_SourcePrefab: {fileID: 100100000, guid: b1b452adf0a1f6049bf4f965bb805caa, type: 3}
 --- !u!1001 &76468196
 PrefabInstance:
@@ -1250,7 +1254,7 @@ MonoBehaviour:
   questTitleText: {fileID: 964430126}
   questDescriptionText: {fileID: 446991464}
   quests:
-  - questTitle: MISI STEALTH
+  - questTitle: OBJECTIVE
     objectives:
     - description: Pergi ke kamar orang tua
       isCompleted: 0
@@ -1766,22 +1770,22 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
@@ -1791,7 +1795,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
@@ -1801,7 +1805,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
       propertyPath: m_Name
-      value: JannahJalan
+      value: Jannah
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4def4778cc7b81d4a950a41f76a869d7,
         type: 3}
@@ -1840,6 +1844,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1312284438}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4def4778cc7b81d4a950a41f76a869d7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1312284444}
   m_SourcePrefab: {fileID: 100100000, guid: 4def4778cc7b81d4a950a41f76a869d7, type: 3}
 --- !u!1 &316013078
 GameObject:
@@ -2278,9 +2286,13 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0f928c88922c5ac46a75cf062f732071,
         type: 3}
-      insertIndex: 0
+      insertIndex: -1
       addedObject: {fileID: 1981711141}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0f928c88922c5ac46a75cf062f732071,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2071655531}
   m_SourcePrefab: {fileID: 100100000, guid: 0f928c88922c5ac46a75cf062f732071, type: 3}
 --- !u!1001 &381756167
 PrefabInstance:
@@ -4590,6 +4602,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 564141406}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &884935593 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b1b452adf0a1f6049bf4f965bb805caa,
+    type: 3}
+  m_PrefabInstance: {fileID: 71981460}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &889466311
 GameObject:
   m_ObjectHideFlags: 0
@@ -6062,12 +6080,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd007bb2e97dbf4c9d7b1013c29a0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelTransform: {fileID: 0}
+  modelTransform: {fileID: 778150322}
   leftAngle: -90
   rightAngle: 0
   rotationSpeed: 10
   lookInterval: 5
   startLookingLeft: 0
+  animator: {fileID: 2071655531}
+  angleThreshold: 5
 --- !u!1 &1219994663
 GameObject:
   m_ObjectHideFlags: 0
@@ -6701,9 +6721,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1312284438}
-  moveSpeed: 5
+  moveSpeed: 1
   lookSensitivity: 1
   gravity: -9.81
+  animator: {fileID: 1312284444}
+  dialogueManager: {fileID: 0}
 --- !u!136 &1312284441
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -6777,6 +6799,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312284436}
   m_Mesh: {fileID: 0}
+--- !u!95 &1312284444
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312284436}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a369818914cbbe14a870c2b8b8830d2a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &1318733284
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8893,6 +8936,8 @@ MonoBehaviour:
   nameTextComponent: {fileID: 1914022650}
   dialogueTextComponent: {fileID: 1830213358}
   dialogueBox: {fileID: 1804208908}
+  audioSource: {fileID: 0}
+  clickSound: {fileID: 8300000, guid: 12e3629ba25b2c140b3d694b2768d463, type: 3}
   lines:
   - characterName: 'JANNAH '
     sentence: "Ugh... kenapa tiap pagi rasanya berat banget buat bangun ya\u2026"
@@ -9170,6 +9215,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 71981460}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &1795185635
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884935593}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 637591335a8ee7543bda4c991afb46cc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1795908860 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3039179305499685095, guid: 1a9fbc7f58545c34d96a1092cf579c44,
@@ -10969,12 +11035,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd007bb2e97dbf4c9d7b1013c29a0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelTransform: {fileID: 0}
+  modelTransform: {fileID: 1795185634}
   leftAngle: 180
   rightAngle: 0
   rotationSpeed: 2
   lookInterval: 4
   startLookingLeft: 0
+  animator: {fileID: 1795185635}
+  angleThreshold: 5
+--- !u!1 &2071655530 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0f928c88922c5ac46a75cf062f732071,
+    type: 3}
+  m_PrefabInstance: {fileID: 372821199}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2071655531
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071655530}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d35bf22f81e63fe4c8f8fa3b1592fb46, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2074416141
 GameObject:
   m_ObjectHideFlags: 0
@@ -11012,6 +11107,7 @@ MonoBehaviour:
   ibuNPC: {fileID: 0}
   bapakNPC: {fileID: 0}
   dialogueManager: {fileID: 1770258341}
+  questManager: {fileID: 0}
   showDialogueAfterChoice2: 1
   delayBeforeDialogue: 1
 --- !u!4 &2074416143

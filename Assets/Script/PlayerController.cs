@@ -2,10 +2,17 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public CharacterController controller;
     public float moveSpeed = 5f;
     public float lookSensitivity = 1f;
     public float gravity = -9.81f;
+
+    [Header("Animation")]
+    public Animator animator;
+
+    [Header("Dialogue Settings")]
+    public Dialogue dialogueManager;  // TAMBAHAN BARU
 
     private Camera playerCamera;
     private Vector3 moveDirection;
@@ -22,17 +29,49 @@ public class PlayerController : MonoBehaviour
         playerCamera = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
 
-        // Ambil referensi PlayerChairController
         chairController = GetComponent<PlayerChairController>();
+
+        // AUTO-DETECT ANIMATOR
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+            if (animator != null)
+            {
+                Debug.Log("Animator otomatis terdeteksi!");
+            }
+        }
+
+        // AUTO-DETECT DIALOGUE MANAGER
+        if (dialogueManager == null)
+        {
+            dialogueManager = FindObjectOfType<Dialogue>();
+        }
     }
 
     void Update()
     {
+        // CEK APAKAH DIALOG SEDANG BERLANGSUNG - BLOKIR SEMUA INPUT!
+        if (dialogueManager != null && dialogueManager.IsDialogueActive())
+        {
+            // Stop animasi saat dialog
+            if (animator != null)
+            {
+                animator.speed = 0f;
+            }
+            return; // BLOKIR SEMUA KONTROL
+        }
+
         // **Cek jika sedang duduk**
         bool isSitting = (chairController != null && chairController.IsSitting());
 
         if (isSitting)
         {
+            // STOP ANIMASI SAAT DUDUK
+            if (animator != null)
+            {
+                animator.speed = 0f;
+            }
+
             // Tetap bisa berdiri dengan menekan F
             if (Input.GetKeyDown(KeyCode.F))
             {
@@ -46,6 +85,22 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
         moveDirection = transform.right * x + transform.forward * z;
+
+        // CEK APAKAH SEDANG BERGERAK
+        bool isMoving = moveDirection.magnitude > 0.1f;
+
+        // KONTROL ANIMASI WALK (PLAY/STOP)
+        if (animator != null)
+        {
+            if (isMoving)
+            {
+                animator.speed = 1f; // PLAY animation normal
+            }
+            else
+            {
+                animator.speed = 0f; // STOP/FREEZE animation
+            }
+        }
 
         // Gravitasi
         if (controller.isGrounded && playerVelocity.y < 0)
