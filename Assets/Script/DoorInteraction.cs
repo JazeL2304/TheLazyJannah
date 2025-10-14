@@ -5,17 +5,30 @@ public class DoorInteraction : MonoBehaviour
     public Animator doorAnimator;
     public GameObject interactionUI;
 
-    // PERBAIKAN: Method yang dipanggil dari PlayerController
+    // TAMBAHAN BARU: Property untuk cek status pintu (diakses dari luar)
+    public bool isOpen
+    {
+        get
+        {
+            if (doorAnimator != null)
+            {
+                return doorAnimator.GetBool("IsOpen");
+            }
+            return false;
+        }
+    }
+
+    // Method yang dipanggil dari PlayerController
     public void InteractWithDoor()
     {
         // Periksa status animasi pintu dari parameter Animator
-        bool isOpen = doorAnimator.GetBool("IsOpen");
+        bool currentState = doorAnimator.GetBool("IsOpen");
 
         // Ubah status animasi (dari terbuka ke tertutup, dan sebaliknya)
-        doorAnimator.SetBool("IsOpen", !isOpen);
+        doorAnimator.SetBool("IsOpen", !currentState);
 
         // Pesan konfirmasi
-        Debug.Log("Pintu " + (isOpen ? "ditutup" : "dibuka") + "!");
+        Debug.Log("Pintu " + (currentState ? "ditutup" : "dibuka") + "!");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -25,7 +38,7 @@ public class DoorInteraction : MonoBehaviour
         {
             Debug.Log("Pemain terdeteksi di dekat pintu!");
 
-            // PERBAIKAN: Beritahu PlayerController bahwa ini pintu aktif
+            // Beritahu PlayerController bahwa ini pintu aktif
             PlayerController playerController = other.GetComponent<PlayerController>();
             if (playerController != null)
             {
@@ -47,7 +60,7 @@ public class DoorInteraction : MonoBehaviour
         {
             Debug.Log("Pemain keluar dari area pintu.");
 
-            // PERBAIKAN: Beritahu PlayerController bahwa tidak ada pintu aktif
+            // Beritahu PlayerController bahwa tidak ada pintu aktif
             PlayerController playerController = other.GetComponent<PlayerController>();
             if (playerController != null)
             {

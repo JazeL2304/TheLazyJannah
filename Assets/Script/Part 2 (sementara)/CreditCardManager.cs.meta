@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0f2d08bf78caf9249b254f77ae507926
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - creditCardPrefab: {fileID: 2107409826236812522, guid: fab9682f0f947634f980392b9cae937b,
+      type: 3}
+  - itemHolder: {instanceID: 0}
+  - questManager: {instanceID: 0}
+  - promptUI: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

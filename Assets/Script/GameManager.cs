@@ -225,3 +225,4 @@ public class GameManager : MonoBehaviour
         return playerChoice == 2;
     }
 }
+    
