@@ -192,7 +192,10 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Tekan F untuk berdiri dan mulai misi!");
     }
-
+    public void EndGame1()
+    {
+        SceneManager.LoadScene("Phone"); // atau nama scene ending kamu
+    }
     public void LoadMainMenu()
     {
         Debug.Log("Loading Main Menu...");

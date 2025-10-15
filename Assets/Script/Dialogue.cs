@@ -25,14 +25,18 @@ public class Dialogue : MonoBehaviour
     public int showChoiceAtLineIndex = 7;
     public DialogueChoice dialogueChoice;
 
+    [Header("End Game Settings")]
+    public bool isLastDialogueAct1 = false;
+    public GameObject endingCanvas;
+
     [Header("Post-Choice Dialogue")]
     public int continueFromLineAfterChoice2 = 9;
-    public int endLineAfterChoice2 = 10; // Line terakhir dialog setelah choice 2
+    public int endLineAfterChoice2 = 10;
 
     private int index;
     private bool isPaused = false;
     private bool isTyping = false;
-    private bool isPostChoice2Dialogue = false; // Flag untuk track dialog setelah choice 2
+    private bool isPostChoice2Dialogue = false;
 
     [System.Serializable]
     public struct DialogueLine
@@ -68,7 +72,6 @@ public class Dialogue : MonoBehaviour
             return;
         }
 
-        // AUTO-CREATE AudioSource jika belum ada
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -84,15 +87,13 @@ public class Dialogue : MonoBehaviour
     {
         if (isPaused) return;
 
-        // CEK: Hanya jalankan jika DialogueBox aktif
         if (dialogueBox != null && !dialogueBox.activeSelf)
         {
-            return; // DialogueBox tidak aktif, skip
+            return;
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            // PLAY SOUND EFFECT SAAT KLIK! (hanya saat dialog aktif)
             PlayClickSound();
 
             if (isTyping)
@@ -108,7 +109,6 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    // FUNGSI BARU - Play Click Sound
     void PlayClickSound()
     {
         if (audioSource != null && clickSound != null)
@@ -117,10 +117,8 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    // FUNGSI BARU - Cek apakah dialog sedang aktif (untuk blokir player movement)
     public bool IsDialogueActive()
     {
-        // Dialog aktif jika DialogueBox terlihat
         return dialogueBox != null && dialogueBox.activeSelf;
     }
 
@@ -152,7 +150,7 @@ public class Dialogue : MonoBehaviour
         {
             Debug.Log("Dialog lanjutan setelah choice 2 - Line " + (continueFromLineAfterChoice2 + 1));
             index = continueFromLineAfterChoice2;
-            isPostChoice2Dialogue = true; // Set flag
+            isPostChoice2Dialogue = true;
             ShowDialogueBox();
             DisplayLine();
         }
@@ -190,7 +188,6 @@ public class Dialogue : MonoBehaviour
 
     void NextLine()
     {
-        // CEK: Jika sedang dialog post-choice 2, cek apakah sudah sampai end line
         if (isPostChoice2Dialogue && index >= endLineAfterChoice2)
         {
             Debug.Log("Dialog post-choice 2 selesai di line " + (index + 1));
@@ -245,11 +242,26 @@ public class Dialogue : MonoBehaviour
         isPostChoice2Dialogue = false;
         Debug.Log("Dialog setelah choice 2 selesai - Memulai stealth mission");
 
-        // Notify GameManager bahwa dialog selesai
         GameManager gameManager = FindObjectOfType<GameManager>();
         if (gameManager != null)
         {
             gameManager.OnDialogueCompleteAfterChoice2();
+        }
+    }
+
+    // ✅ FUNCTION BARU - Dipanggil dari EndingDialogueTrigger!
+    public void ShowEndingCanvas()
+    {
+        Debug.Log("[DialogueManager] ✅ ShowEndingCanvas() called!");
+
+        if (endingCanvas != null)
+        {
+            endingCanvas.SetActive(true);
+            Debug.Log("[DialogueManager] 🎬 Canvas Act 1 End MUNCUL!");
+        }
+        else
+        {
+            Debug.LogError("[DialogueManager] ❌ endingCanvas belum di-assign di Inspector!");
         }
     }
 

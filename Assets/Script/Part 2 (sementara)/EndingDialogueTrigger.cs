@@ -24,7 +24,10 @@ public class EndingDialogueTrigger : MonoBehaviour
 
     [Header("Prerequisite - Dialogue Foto Harus Selesai")]
     public int requiredQuestIndex = 0;
-    public int requiredObjectiveIndex = 2; // ← Objective "Balik ke kamar"
+    public int requiredObjectiveIndex = 2;
+
+    [Header("🎬 DIALOGUE MANAGER")]
+    public Dialogue dialogueManagerScript;
 
     private bool hasTriggered = false;
     private int currentLine = 0;
@@ -41,6 +44,11 @@ public class EndingDialogueTrigger : MonoBehaviour
         if (questManager == null)
         {
             questManager = FindObjectOfType<QuestManager>();
+        }
+
+        if (dialogueManagerScript == null)
+        {
+            dialogueManagerScript = FindObjectOfType<Dialogue>();
         }
 
         Debug.Log("[EndingTrigger] Script initialized!");
@@ -83,11 +91,10 @@ public class EndingDialogueTrigger : MonoBehaviour
             return;
         }
 
-        // CEK: Dialogue foto sudah selesai belum?
         if (questManager != null && !questManager.IsObjectiveComplete(requiredQuestIndex, requiredObjectiveIndex))
         {
             Debug.Log("[EndingTrigger] Dialogue foto belum selesai! Objective " + requiredObjectiveIndex + " belum complete.");
-            return; // ← BLOKIR trigger!
+            return;
         }
 
         if (other.CompareTag("Player"))
@@ -147,6 +154,17 @@ public class EndingDialogueTrigger : MonoBehaviour
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
+        }
+
+        // PANGGIL FUNCTION DI DIALOGUEMANAGER BUAT MUNCULIN CANVAS!
+        if (dialogueManagerScript != null)
+        {
+            Debug.Log("[EndingTrigger] ✅ Calling DialogueManager to show ending canvas!");
+            dialogueManagerScript.ShowEndingCanvas();
+        }
+        else
+        {
+            Debug.LogError("[EndingTrigger] ❌ DialogueManager script not found!");
         }
 
         Debug.Log("[EndingTrigger] Dialogue finished!");
