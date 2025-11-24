@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 
@@ -28,6 +29,12 @@ public class EndingDialogueTrigger : MonoBehaviour
 
     [Header("🎬 DIALOGUE MANAGER")]
     public Dialogue dialogueManagerScript;
+
+    [Header("🎮 ACT PROGRESSION")]
+    public bool loadNextActAfterDialogue = true; // Toggle untuk load scene berikutnya
+    public int nextAct = 2;
+    public int nextDay = 30;
+    public string loadingSceneName = "LoadingScene";
 
     private bool hasTriggered = false;
     private int currentLine = 0;
@@ -156,7 +163,7 @@ public class EndingDialogueTrigger : MonoBehaviour
             dialogueBox.SetActive(false);
         }
 
-        // PANGGIL FUNCTION DI DIALOGUEMANAGER BUAT MUNCULIN CANVAS!
+        // ✅ PART 1: PANGGIL FUNCTION DI DIALOGUEMANAGER BUAT MUNCULIN CANVAS!
         if (dialogueManagerScript != null)
         {
             Debug.Log("[EndingTrigger] ✅ Calling DialogueManager to show ending canvas!");
@@ -167,6 +174,35 @@ public class EndingDialogueTrigger : MonoBehaviour
             Debug.LogError("[EndingTrigger] ❌ DialogueManager script not found!");
         }
 
+        // ✅ PART 2: LOAD NEXT ACT (JIKA DIAKTIFKAN)
+        if (loadNextActAfterDialogue)
+        {
+            Debug.Log($"[EndingTrigger] 🎬 Act 1 Done! Preparing to load Act {nextAct} Day {nextDay}...");
+            StartCoroutine(LoadNextAct());
+        }
+
         Debug.Log("[EndingTrigger] Dialogue finished!");
+    }
+
+    IEnumerator LoadNextAct()
+    {
+        // Delay sebentar biar ShowEndingCanvas kebaca dulu
+        yield return new WaitForSeconds(1.5f);
+
+        // SET PROGRESS KE ACT & DAY BERIKUTNYA
+        if (GameProgressManager.Instance != null)
+        {
+            GameProgressManager.Instance.SetProgress(nextAct, nextDay);
+            Debug.Log($"[EndingTrigger] ✅ Progress set to ACT {nextAct} DAY {nextDay}");
+        }
+        else
+        {
+            Debug.LogWarning("[EndingTrigger] ⚠️ GameProgressManager not found! Progress not saved.");
+        }
+
+        // LOAD LOADING SCENE
+        yield return new WaitForSeconds(0.5f);
+        Debug.Log($"[EndingTrigger] 🎮 Loading scene: {loadingSceneName}");
+        SceneManager.LoadScene(loadingSceneName);
     }
 }

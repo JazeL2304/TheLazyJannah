@@ -468,6 +468,8 @@ MonoBehaviour:
   loadingText: {fileID: 1269301151}
   actText: {fileID: 636958089}
   dayText: {fileID: 701800338}
+  actTextContent: {fileID: 636958087}
+  dayTextContent: {fileID: 701800336}
   nextScene: Enviroment Game
   fadeDuration: 1
   stayDuration: 1.5
@@ -633,7 +635,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 636958084}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
