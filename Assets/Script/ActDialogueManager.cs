@@ -25,26 +25,29 @@ public class Act2DialogueManager : MonoBehaviour
     public string[] act2Dialogues;
 
     [Header("🛑 Pause Settings")]
-    public int pauseAfterLineIndex = 1; // Pause setelah line ke-2 (index 1)
+    public int pauseAfterLineIndex = 1;
 
     [Header("📹 CAMERA ROTATION & NPC SPAWN")]
-    public Transform playerTransform; // Reference ke Player GameObject (untuk rotate player, bukan camera)
-    public Camera playerCamera; // Reference ke Camera utama (untuk fallback)
-    public float rotationDuration = 1f; // Durasi rotasi (detik)
-    public GameObject papaNPC; // Reference ke Papa prefab/object
-    public GameObject mamaNPC; // Reference ke Mama prefab/object
-    public Transform npcSpawnPoint; // Posisi spawn NPC (optional)
+    public Transform playerTransform;
+    public Camera playerCamera;
+    public float rotationDuration = 1f;
+    public GameObject papaNPC;
+    public GameObject mamaNPC;
+    public Transform npcSpawnPoint;
+
+    [Header("🚫 ACT 1 NPCs TO DISABLE")]
+    public GameObject[] act1NPCsToDisable; // Papa & Mama dari Act 1 (yang di dapur)
 
     [Header("🎯 PAPA POSITION & ROTATION")]
-    public Vector3 papaPositionOffset = new Vector3(-0.8f, 0f, 0f); // Offset dari spawn point
-    public Vector3 papaRotationEuler = new Vector3(0f, 180f, 0f); // Rotation Papa (Euler angles)
+    public Vector3 papaPositionOffset = new Vector3(-0.8f, 0f, 0f);
+    public Vector3 papaRotationEuler = new Vector3(0f, 180f, 0f);
 
     [Header("🎯 MAMA POSITION & ROTATION")]
-    public Vector3 mamaPositionOffset = new Vector3(0.8f, 0f, 0f); // Offset dari spawn point
-    public Vector3 mamaRotationEuler = new Vector3(0f, 180f, 0f); // Rotation Mama (Euler angles)
+    public Vector3 mamaPositionOffset = new Vector3(0.8f, 0f, 0f);
+    public Vector3 mamaRotationEuler = new Vector3(0f, 180f, 0f);
 
     [Header("💬 DIALOGUE SETELAH SPAWN")]
-    public bool continueDialogueAfterSpawn = true; // Toggle untuk lanjut dialog atau tidak
+    public bool continueDialogueAfterSpawn = true;
 
     [System.Serializable]
     public class DialogueLine
@@ -54,20 +57,20 @@ public class Act2DialogueManager : MonoBehaviour
         public string dialogueText;
     }
 
-    public DialogueLine[] postSpawnDialogues; // Dialog setelah Papa & Mama spawn
+    public DialogueLine[] postSpawnDialogues;
 
     private int currentLine = 0;
     private bool isTyping = false;
     private bool dialogueActive = false;
     private bool isPaused = false;
-    private bool isPostSpawnDialogue = false; // Flag untuk track dialog setelah spawn
+    private bool isPostSpawnDialogue = false;
+    private bool hasSpawnedNPCs = false; // ✅ FLAG BARU - Cegah spawn berulang!
 
     void Start()
     {
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
 
-        // Auto-detect player transform jika belum di-assign
         if (playerTransform == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -78,16 +81,14 @@ public class Act2DialogueManager : MonoBehaviour
             }
         }
 
-        // Auto-detect camera jika belum di-assign
         if (playerCamera == null)
         {
             playerCamera = Camera.main;
         }
 
-        // ✅ JANGAN HIDE NPCs DI START - Mereka sudah ada di Act 1
-        // Kita akan teleport mereka nanti saat dialog selesai
+        // ✅ DISABLE ACT 1 NPCs (Papa & Mama dari dapur)
+        DisableAct1NPCs();
 
-        // Cek apakah ini Act 2
         if (GameProgressManager.Instance != null)
         {
             int currentAct = GameProgressManager.Instance.currentAct;
@@ -127,7 +128,6 @@ public class Act2DialogueManager : MonoBehaviour
             {
                 StopAllCoroutines();
 
-                // Cek apakah sedang post-spawn dialogue
                 if (isPostSpawnDialogue && postSpawnDialogues != null && currentLine < postSpawnDialogues.Length)
                 {
                     dialogueText.text = postSpawnDialogues[currentLine].dialogueText;
@@ -145,14 +145,13 @@ public class Act2DialogueManager : MonoBehaviour
             }
         }
 
-        // ✅ DEBUG TEST - Tekan T untuk spawn NPC secara paksa
+        // DEBUG TEST
         if (Input.GetKeyDown(KeyCode.T))
         {
             Debug.Log("[Act2Dialogue] 🔧 MANUAL TEST - Forcing NPC spawn!");
             SpawnNPCs();
         }
 
-        // ✅ DEBUG TEST - Tekan Y untuk rotate camera secara paksa
         if (Input.GetKeyDown(KeyCode.Y))
         {
             Debug.Log("[Act2Dialogue] 🔧 MANUAL TEST - Forcing camera rotation!");
@@ -165,6 +164,7 @@ public class Act2DialogueManager : MonoBehaviour
         dialogueActive = true;
         isPaused = false;
         currentLine = 0;
+        isPostSpawnDialogue = false; // ✅ RESET FLAG
 
         if (dialogueBox != null)
         {
@@ -216,7 +216,6 @@ public class Act2DialogueManager : MonoBehaviour
         isTyping = true;
         dialogueText.text = "";
 
-        // Pilih dialog source berdasarkan state
         string textToType;
         string speakerName;
 
@@ -225,7 +224,6 @@ public class Act2DialogueManager : MonoBehaviour
             textToType = postSpawnDialogues[currentLine].dialogueText;
             speakerName = postSpawnDialogues[currentLine].characterName;
 
-            // Update nama karakter
             if (nameText != null)
             {
                 nameText.text = speakerName;
@@ -234,7 +232,6 @@ public class Act2DialogueManager : MonoBehaviour
         else
         {
             textToType = act2Dialogues[currentLine];
-            // Gunakan characterName default (JANNAH)
             if (nameText != null)
             {
                 nameText.text = characterName;
@@ -252,7 +249,7 @@ public class Act2DialogueManager : MonoBehaviour
 
     void NextLine()
     {
-        // CEK PAUSE - Pause setelah line tertentu
+        // CEK PAUSE
         if (!isPostSpawnDialogue && currentLine == pauseAfterLineIndex)
         {
             isPaused = true;
@@ -269,7 +266,6 @@ public class Act2DialogueManager : MonoBehaviour
 
         currentLine++;
 
-        // Cek array mana yang digunakan
         int maxLines = isPostSpawnDialogue ?
             (postSpawnDialogues != null ? postSpawnDialogues.Length : 0) :
             act2Dialogues.Length;
@@ -296,23 +292,41 @@ public class Act2DialogueManager : MonoBehaviour
 
         Debug.Log("[Act2Dialogue] Dialogue finished!");
 
-        // ✅ PUTAR KAMERA DAN SPAWN NPC
-        StartCoroutine(RotateCameraAndSpawnNPCs());
+        // ✅ FIX UTAMA - Cek apakah ini dialog pertama atau kedua
+        if (!isPostSpawnDialogue && !hasSpawnedNPCs)
+        {
+            // Dialog PERTAMA selesai → Spawn NPCs & start dialog kedua
+            Debug.Log("[Act2Dialogue] 📹 First dialogue done - Starting spawn sequence...");
+            StartCoroutine(RotateCameraAndSpawnNPCs());
+        }
+        else if (isPostSpawnDialogue)
+        {
+            // Dialog KEDUA selesai → SELESAI TOTAL!
+            Debug.Log("[Act2Dialogue] ✅ Post-spawn dialogue FINISHED - Act 2 dialogue complete!");
+            // Tidak ada yang dilakukan lagi - dialog benar-benar selesai
+        }
     }
 
-    // ✅ FUNCTION BARU - Rotate camera 90 derajat ke kanan & spawn NPCs
     IEnumerator RotateCameraAndSpawnNPCs()
     {
+        // ✅ PREVENT DOUBLE EXECUTION
+        if (hasSpawnedNPCs)
+        {
+            Debug.LogWarning("[Act2Dialogue] ⚠️ NPCs already spawned! Skipping...");
+            yield break;
+        }
+
+        hasSpawnedNPCs = true; // Set flag SEBELUM proses
+
         Debug.Log("[Act2Dialogue] 📹 Starting camera rotation & NPC spawn sequence...");
 
-        // 1. ROTATE PLAYER (bukan camera!) 90 DERAJAT KE KANAN (SMOOTH)
         Transform targetTransform = playerTransform != null ? playerTransform :
                                    (playerCamera != null ? playerCamera.transform : null);
 
         if (targetTransform != null)
         {
             Quaternion startRotation = targetTransform.rotation;
-            Quaternion targetRotation = startRotation * Quaternion.Euler(0, 90f, 0); // Rotate Y-axis 90 derajat
+            Quaternion targetRotation = startRotation * Quaternion.Euler(0, 90f, 0);
 
             float elapsedTime = 0f;
 
@@ -320,16 +334,11 @@ public class Act2DialogueManager : MonoBehaviour
             {
                 elapsedTime += Time.deltaTime;
                 float t = elapsedTime / rotationDuration;
-
-                // Smooth rotation menggunakan Slerp
                 targetTransform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
-
                 yield return null;
             }
 
-            // Pastikan rotation tepat 90 derajat
             targetTransform.rotation = targetRotation;
-
             Debug.Log("[Act2Dialogue] ✅ " + (playerTransform != null ? "Player" : "Camera") + " rotated 90 degrees to the right!");
         }
         else
@@ -337,15 +346,13 @@ public class Act2DialogueManager : MonoBehaviour
             Debug.LogError("[Act2Dialogue] ❌ No transform to rotate! Assign Player Transform or Camera.");
         }
 
-        // 2. SPAWN NPCs
-        yield return new WaitForSeconds(0.3f); // Delay sebentar biar smooth
+        yield return new WaitForSeconds(0.3f);
 
         SpawnNPCs();
 
-        // 3. LANJUT DIALOG (jika diaktifkan)
         if (continueDialogueAfterSpawn && postSpawnDialogues != null && postSpawnDialogues.Length > 0)
         {
-            yield return new WaitForSeconds(0.5f); // Delay sebelum dialog
+            yield return new WaitForSeconds(0.5f);
             StartPostSpawnDialogue();
         }
 
@@ -356,31 +363,24 @@ public class Act2DialogueManager : MonoBehaviour
     {
         Debug.Log("[Act2Dialogue] 🎯 SpawnNPCs() CALLED!");
 
-        // CEK APAKAH ADA SPAWN POINT
         if (npcSpawnPoint == null)
         {
-            Debug.LogError("[Act2Dialogue] ❌ NPC Spawn Point not assigned! Please assign NPCSpawnPoint in Inspector.");
+            Debug.LogError("[Act2Dialogue] ❌ NPC Spawn Point not assigned!");
             return;
         }
 
-        // ========== TELEPORT & SPAWN PAPA ==========
+        // PAPA
         if (papaNPC != null)
         {
             Debug.Log($"[Act2Dialogue] Papa NPC found: {papaNPC.name}");
-
-            // DISABLE MOVEMENT SCRIPTS (NPCPatrol, NPCStaticLookAround, dll)
             DisableNPCMovement(papaNPC);
 
-            // CALCULATE POSITION dengan offset yang bisa diatur di Inspector
             Vector3 papaTargetPosition = npcSpawnPoint.position + papaPositionOffset;
-
             papaNPC.transform.position = papaTargetPosition;
             papaNPC.transform.rotation = Quaternion.Euler(papaRotationEuler);
 
             Debug.Log($"[Act2Dialogue] Papa teleported to: {papaNPC.transform.position}");
-            Debug.Log($"[Act2Dialogue] Papa rotation: {papaNPC.transform.rotation.eulerAngles}");
 
-            // AKTIFKAN NPC (jika belum aktif)
             if (!papaNPC.activeSelf)
             {
                 papaNPC.SetActive(true);
@@ -391,27 +391,21 @@ public class Act2DialogueManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[Act2Dialogue] ❌ Papa NPC not assigned! Drag 'Bapak' GameObject from Hierarchy.");
+            Debug.LogError("[Act2Dialogue] ❌ Papa NPC not assigned!");
         }
 
-        // ========== TELEPORT & SPAWN MAMA ==========
+        // MAMA
         if (mamaNPC != null)
         {
             Debug.Log($"[Act2Dialogue] Mama NPC found: {mamaNPC.name}");
-
-            // DISABLE MOVEMENT SCRIPTS
             DisableNPCMovement(mamaNPC);
 
-            // CALCULATE POSITION dengan offset yang bisa diatur di Inspector
             Vector3 mamaTargetPosition = npcSpawnPoint.position + mamaPositionOffset;
-
             mamaNPC.transform.position = mamaTargetPosition;
             mamaNPC.transform.rotation = Quaternion.Euler(mamaRotationEuler);
 
             Debug.Log($"[Act2Dialogue] Mama teleported to: {mamaNPC.transform.position}");
-            Debug.Log($"[Act2Dialogue] Mama rotation: {mamaNPC.transform.rotation.eulerAngles}");
 
-            // AKTIFKAN NPC (jika belum aktif)
             if (!mamaNPC.activeSelf)
             {
                 mamaNPC.SetActive(true);
@@ -422,18 +416,16 @@ public class Act2DialogueManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[Act2Dialogue] ❌ Mama NPC not assigned! Drag 'Ibu' GameObject from Hierarchy.");
+            Debug.LogError("[Act2Dialogue] ❌ Mama NPC not assigned!");
         }
 
         Debug.Log("[Act2Dialogue] 🎯 SpawnNPCs() FINISHED!");
     }
 
-    // ✅ FUNCTION BARU - Matikan script movement NPC
     void DisableNPCMovement(GameObject npc)
     {
         if (npc == null) return;
 
-        // Disable NPCPatrol
         NPCPatrol patrol = npc.GetComponent<NPCPatrol>();
         if (patrol != null)
         {
@@ -441,7 +433,6 @@ public class Act2DialogueManager : MonoBehaviour
             Debug.Log($"[Act2Dialogue] NPCPatrol disabled on {npc.name}");
         }
 
-        // Disable NPCStaticLookAround
         NPCStaticLookAround lookAround = npc.GetComponent<NPCStaticLookAround>();
         if (lookAround != null)
         {
@@ -449,7 +440,6 @@ public class Act2DialogueManager : MonoBehaviour
             Debug.Log($"[Act2Dialogue] NPCStaticLookAround disabled on {npc.name}");
         }
 
-        // Disable CharacterController (agar tidak bergerak)
         CharacterController controller = npc.GetComponent<CharacterController>();
         if (controller != null)
         {
@@ -457,21 +447,19 @@ public class Act2DialogueManager : MonoBehaviour
             Debug.Log($"[Act2Dialogue] CharacterController disabled on {npc.name}");
         }
 
-        // Disable Animator (agar tidak animasi jalan)
         Animator animator = npc.GetComponent<Animator>();
         if (animator != null)
         {
-            animator.speed = 0f; // Freeze animation
+            animator.speed = 0f;
             Debug.Log($"[Act2Dialogue] Animator frozen on {npc.name}");
         }
     }
 
-    // ✅ FUNCTION BARU - Start dialog setelah spawn
     void StartPostSpawnDialogue()
     {
         Debug.Log("[Act2Dialogue] 💬 Starting post-spawn dialogue...");
 
-        isPostSpawnDialogue = true;
+        isPostSpawnDialogue = true; // ✅ SET FLAG
         dialogueActive = true;
         currentLine = 0;
 
@@ -480,7 +468,6 @@ public class Act2DialogueManager : MonoBehaviour
             dialogueBox.SetActive(true);
         }
 
-        // Nama akan di-update di TypeLine() sesuai DialogueLine
         StartCoroutine(TypeLine());
     }
 
@@ -490,5 +477,26 @@ public class Act2DialogueManager : MonoBehaviour
         {
             audioSource.PlayOneShot(clickSound);
         }
+    }
+
+    // ✅ FUNCTION BARU - Disable NPCs dari Act 1
+    void DisableAct1NPCs()
+    {
+        if (act1NPCsToDisable == null || act1NPCsToDisable.Length == 0)
+        {
+            Debug.LogWarning("[Act2Dialogue] No Act 1 NPCs assigned to disable");
+            return;
+        }
+
+        foreach (GameObject npc in act1NPCsToDisable)
+        {
+            if (npc != null)
+            {
+                npc.SetActive(false);
+                Debug.Log($"[Act2Dialogue] ✅ Disabled Act 1 NPC: {npc.name}");
+            }
+        }
+
+        Debug.Log($"[Act2Dialogue] Total {act1NPCsToDisable.Length} Act 1 NPCs disabled");
     }
 }

@@ -3836,11 +3836,26 @@ MonoBehaviour:
   - dsadasdasd
   - dgsdfgdsgsdfg
   pauseAfterLineIndex: 1
+  playerTransform: {fileID: 1312284437}
   playerCamera: {fileID: 330585545}
   rotationDuration: 2
-  papaNPC: {fileID: 0}
-  mamaNPC: {fileID: 0}
-  npcSpawnPoint: {fileID: 0}
+  papaNPC: {fileID: 1208887903}
+  mamaNPC: {fileID: 2058303081}
+  npcSpawnPoint: {fileID: 1994211049}
+  papaPositionOffset: {x: 0.3, y: 0, z: 0}
+  papaRotationEuler: {x: 0, y: 0, z: 0}
+  mamaPositionOffset: {x: 1.2, y: 0.5, z: -0.5}
+  mamaRotationEuler: {x: 0, y: 180, z: 0}
+  continueDialogueAfterSpawn: 1
+  postSpawnDialogues:
+  - characterName: asdasdas
+    dialogueText: dsadasd
+  - characterName: dasdas
+    dialogueText: asdsad
+  - characterName: dasdasd
+    dialogueText: asdasdsa
+  - characterName: sadsad
+    dialogueText: adsadsa
 --- !u!4 &521545918
 Transform:
   m_ObjectHideFlags: 0
@@ -14329,7 +14344,7 @@ Transform:
   m_GameObject: {fileID: 1994211048}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.169, y: -0.574, z: -1.153}
+  m_LocalPosition: {x: -1.495, y: 0.369, z: -1.153}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
