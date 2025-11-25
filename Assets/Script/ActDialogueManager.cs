@@ -36,7 +36,7 @@ public class Act2DialogueManager : MonoBehaviour
     public Transform npcSpawnPoint;
 
     [Header("🚫 ACT 1 NPCs TO DISABLE")]
-    public GameObject[] act1NPCsToDisable; // Papa & Mama dari Act 1 (yang di dapur)
+    public GameObject[] act1NPCsToDisable;
 
     [Header("🎯 PAPA POSITION & ROTATION")]
     public Vector3 papaPositionOffset = new Vector3(-0.8f, 0f, 0f);
@@ -59,12 +59,18 @@ public class Act2DialogueManager : MonoBehaviour
 
     public DialogueLine[] postSpawnDialogues;
 
+    // ✅ TAMBAHAN BARU - CHOICE PANEL SETTINGS
+    [Header("🎯 CHOICE PANEL SETTINGS")]
+    public bool showChoiceAfterDialogue = true;
+    public GameObject choicePanel;
+    public Act2ChoiceManager choiceManager;
+
     private int currentLine = 0;
     private bool isTyping = false;
     private bool dialogueActive = false;
     private bool isPaused = false;
     private bool isPostSpawnDialogue = false;
-    private bool hasSpawnedNPCs = false; // ✅ FLAG BARU - Cegah spawn berulang!
+    private bool hasSpawnedNPCs = false;
 
     void Start()
     {
@@ -86,8 +92,19 @@ public class Act2DialogueManager : MonoBehaviour
             playerCamera = Camera.main;
         }
 
-        // ✅ DISABLE ACT 1 NPCs (Papa & Mama dari dapur)
+        // ✅ DISABLE ACT 1 NPCs
         DisableAct1NPCs();
+
+        // ✅ AUTO-DETECT CHOICE MANAGER
+        if (choiceManager == null)
+        {
+            choiceManager = FindObjectOfType<Act2ChoiceManager>();
+        }
+
+        if (choicePanel != null)
+        {
+            choicePanel.SetActive(false);
+        }
 
         if (GameProgressManager.Instance != null)
         {
@@ -164,7 +181,7 @@ public class Act2DialogueManager : MonoBehaviour
         dialogueActive = true;
         isPaused = false;
         currentLine = 0;
-        isPostSpawnDialogue = false; // ✅ RESET FLAG
+        isPostSpawnDialogue = false;
 
         if (dialogueBox != null)
         {
@@ -301,22 +318,31 @@ public class Act2DialogueManager : MonoBehaviour
         }
         else if (isPostSpawnDialogue)
         {
-            // Dialog KEDUA selesai → SELESAI TOTAL!
-            Debug.Log("[Act2Dialogue] ✅ Post-spawn dialogue FINISHED - Act 2 dialogue complete!");
-            // Tidak ada yang dilakukan lagi - dialog benar-benar selesai
+            // Dialog KEDUA selesai → TAMPILKAN CHOICE PANEL!
+            Debug.Log("[Act2Dialogue] ✅ Post-spawn dialogue FINISHED!");
+
+            // ✅ TAMPILKAN CHOICE PANEL JIKA DIAKTIFKAN
+            if (showChoiceAfterDialogue && choiceManager != null)
+            {
+                Debug.Log("[Act2Dialogue] 🎯 Showing Act 2 Choice Panel...");
+                choiceManager.ShowChoicePanel();
+            }
+            else
+            {
+                Debug.Log("[Act2Dialogue] ✅ Act 2 dialogue complete (no choice panel)!");
+            }
         }
     }
 
     IEnumerator RotateCameraAndSpawnNPCs()
     {
-        // ✅ PREVENT DOUBLE EXECUTION
         if (hasSpawnedNPCs)
         {
             Debug.LogWarning("[Act2Dialogue] ⚠️ NPCs already spawned! Skipping...");
             yield break;
         }
 
-        hasSpawnedNPCs = true; // Set flag SEBELUM proses
+        hasSpawnedNPCs = true;
 
         Debug.Log("[Act2Dialogue] 📹 Starting camera rotation & NPC spawn sequence...");
 
@@ -459,7 +485,7 @@ public class Act2DialogueManager : MonoBehaviour
     {
         Debug.Log("[Act2Dialogue] 💬 Starting post-spawn dialogue...");
 
-        isPostSpawnDialogue = true; // ✅ SET FLAG
+        isPostSpawnDialogue = true;
         dialogueActive = true;
         currentLine = 0;
 
@@ -479,7 +505,6 @@ public class Act2DialogueManager : MonoBehaviour
         }
     }
 
-    // ✅ FUNCTION BARU - Disable NPCs dari Act 1
     void DisableAct1NPCs()
     {
         if (act1NPCsToDisable == null || act1NPCsToDisable.Length == 0)
