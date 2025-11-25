@@ -290,7 +290,9 @@ MonoBehaviour:
   currentDay: 1
   actText: {fileID: 0}
   dayText: {fileID: 0}
-  resetOnStart: 1
+  act1OnlyUI: []
+  act2OnlyUI: []
+  resetOnStart: 0
 --- !u!4 &12967774
 Transform:
   m_ObjectHideFlags: 0
@@ -3834,6 +3836,11 @@ MonoBehaviour:
   - dsadasdasd
   - dgsdfgdsgsdfg
   pauseAfterLineIndex: 1
+  playerCamera: {fileID: 330585545}
+  rotationDuration: 2
+  papaNPC: {fileID: 0}
+  mamaNPC: {fileID: 0}
+  npcSpawnPoint: {fileID: 0}
 --- !u!4 &521545918
 Transform:
   m_ObjectHideFlags: 0
@@ -10129,6 +10136,7 @@ Transform:
   - {fileID: 891818240}
   - {fileID: 293709713}
   - {fileID: 717578382}
+  - {fileID: 1994211049}
   m_Father: {fileID: 485476781}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1456960190
@@ -10566,11 +10574,7 @@ MonoBehaviour:
   - {fileID: 1332439805}
   - {fileID: 853729750}
   - {fileID: 1740804674}
-  - {fileID: 411935594}
-  - {fileID: 684055792}
-  - {fileID: 1925431570}
   - {fileID: 972988718}
-  - {fileID: 684055792}
   act2Objects:
   - {fileID: 521545916}
   act3Objects: []
@@ -14300,6 +14304,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1324534554}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1994211048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1994211049}
+  m_Layer: 0
+  m_Name: NPCSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1994211049
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1994211048}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.169, y: -0.574, z: -1.153}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1443957832}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2009507977 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -293203802875518696, guid: efaa12951850bf140b97f8879beb066a,
