@@ -59,7 +59,6 @@ public class Act2DialogueManager : MonoBehaviour
 
     public DialogueLine[] postSpawnDialogues;
 
-    // ✅ TAMBAHAN BARU - CHOICE PANEL SETTINGS
     [Header("🎯 CHOICE PANEL SETTINGS")]
     public bool showChoiceAfterDialogue = true;
     public GameObject choicePanel;
@@ -92,10 +91,8 @@ public class Act2DialogueManager : MonoBehaviour
             playerCamera = Camera.main;
         }
 
-        // ✅ DISABLE ACT 1 NPCs
         DisableAct1NPCs();
 
-        // ✅ AUTO-DETECT CHOICE MANAGER
         if (choiceManager == null)
         {
             choiceManager = FindObjectOfType<Act2ChoiceManager>();
@@ -162,7 +159,6 @@ public class Act2DialogueManager : MonoBehaviour
             }
         }
 
-        // DEBUG TEST
         if (Input.GetKeyDown(KeyCode.T))
         {
             Debug.Log("[Act2Dialogue] 🔧 MANUAL TEST - Forcing NPC spawn!");
@@ -278,6 +274,8 @@ public class Act2DialogueManager : MonoBehaviour
             }
 
             Debug.Log("[Act2Dialogue] 🛑 Dialogue PAUSED after line " + (currentLine + 1));
+            // DOOR KNOCK SOUND AKAN DIPUTAR OLEH ChairInteraction SAAT PLAYER DUDUK!
+
             return;
         }
 
@@ -309,19 +307,15 @@ public class Act2DialogueManager : MonoBehaviour
 
         Debug.Log("[Act2Dialogue] Dialogue finished!");
 
-        // ✅ FIX UTAMA - Cek apakah ini dialog pertama atau kedua
         if (!isPostSpawnDialogue && !hasSpawnedNPCs)
         {
-            // Dialog PERTAMA selesai → Spawn NPCs & start dialog kedua
             Debug.Log("[Act2Dialogue] 📹 First dialogue done - Starting spawn sequence...");
             StartCoroutine(RotateCameraAndSpawnNPCs());
         }
         else if (isPostSpawnDialogue)
         {
-            // Dialog KEDUA selesai → TAMPILKAN CHOICE PANEL!
             Debug.Log("[Act2Dialogue] ✅ Post-spawn dialogue FINISHED!");
 
-            // ✅ TAMPILKAN CHOICE PANEL JIKA DIAKTIFKAN
             if (showChoiceAfterDialogue && choiceManager != null)
             {
                 Debug.Log("[Act2Dialogue] 🎯 Showing Act 2 Choice Panel...");
@@ -395,7 +389,6 @@ public class Act2DialogueManager : MonoBehaviour
             return;
         }
 
-        // PAPA
         if (papaNPC != null)
         {
             Debug.Log($"[Act2Dialogue] Papa NPC found: {papaNPC.name}");
@@ -420,7 +413,6 @@ public class Act2DialogueManager : MonoBehaviour
             Debug.LogError("[Act2Dialogue] ❌ Papa NPC not assigned!");
         }
 
-        // MAMA
         if (mamaNPC != null)
         {
             Debug.Log($"[Act2Dialogue] Mama NPC found: {mamaNPC.name}");

@@ -292,7 +292,7 @@ MonoBehaviour:
   dayText: {fileID: 0}
   act1OnlyUI: []
   act2OnlyUI: []
-  resetOnStart: 1
+  resetOnStart: 0
 --- !u!4 &12967774
 Transform:
   m_ObjectHideFlags: 0
@@ -788,7 +788,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Mengaku dan minta maaf
+  m_text: Mengaku
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aa523eea0454c1f4fb62ed2c18a411b1, type: 2}
   m_sharedMaterial: {fileID: 4044227791960271190, guid: aa523eea0454c1f4fb62ed2c18a411b1,
@@ -4085,13 +4085,14 @@ MonoBehaviour:
   startDelay: 0.5
   clickSound: {fileID: 8300000, guid: 12e3629ba25b2c140b3d694b2768d463, type: 3}
   act2Dialogues:
-  - hahaha jadi gini
-  - ngapain si sekolah hahaha, mending main game lagi
-  - adsadsadasdas
-  - asdsadasasda
-  - dsadasdasd
-  - dgsdfgdsgsdfg
-  pauseAfterLineIndex: 1
+  - "Hari ini bosen banget\u2026 mending main game aja."
+  - "Aduh\u2026 skin baru rilis hari ini\u2026 cakep banget lagi."
+  - Kayaknya kalau punya skin itu, gameplay gua jadi makin keren sih. Hehehe.
+  - "Cuma 120 ribu doang kok\u2026 kemarin juga aman-aman aja. Lagian\u2026 siapa
+    juga yang bakal tau?"
+  - "Gila\u2026 keren banget. Waduh, ini harus punya sih."
+  - "Eh? Siapa sih? Ganggu banget\u2026"
+  pauseAfterLineIndex: 0
   playerTransform: {fileID: 1312284437}
   playerCamera: {fileID: 330585545}
   rotationDuration: 1
@@ -4105,14 +4106,18 @@ MonoBehaviour:
   mamaRotationEuler: {x: 0, y: 0, z: 0}
   continueDialogueAfterSpawn: 1
   postSpawnDialogues:
-  - characterName: asdasdas
-    dialogueText: dsadasd
-  - characterName: dasdas
-    dialogueText: asdsad
-  - characterName: dasdasd
-    dialogueText: asdasdsa
-  - characterName: sadsad
-    dialogueText: adsadsa
+  - characterName: Jannah
+    dialogueText: "A-astaga\u2026 kenapa tiba-tiba Bapak sama ibu ke kamar\u2026?"
+  - characterName: Papa & Mama
+    dialogueText: "Kamu\u2026 bisa jelaskan ini semua?"
+  - characterName: Papa & Mama
+    dialogueText: Tagihan kartu kredit kita melonjak drastis. Ada banyak transaksi
+      yang jelas bukan dari kami. Kamu tahu sesuatu tentang ini?
+  - characterName: Jannah
+    dialogueText: Maksudnya apa ya pa, ma?
+  - characterName: Papa & Mama
+    dialogueText: Jangan pura-pura tidak tahu, Nak. Kami ingin kamu jujur. Kamu yang
+      pakai kartu kredit ini?
   showChoiceAfterDialogue: 1
   choicePanel: {fileID: 0}
   choiceManager: {fileID: 0}
@@ -11352,7 +11357,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Diam dan pura-pura tidak tahu
+  m_text: Pura-pura tidak tahu
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aa523eea0454c1f4fb62ed2c18a411b1, type: 2}
   m_sharedMaterial: {fileID: 4044227791960271190, guid: aa523eea0454c1f4fb62ed2c18a411b1,
@@ -13515,8 +13520,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25, y: -300}
-  m_SizeDelta: {x: -150, y: -800}
+  m_AnchoredPosition: {x: 25, y: -315}
+  m_SizeDelta: {x: -150, y: -770}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1804208910
 MonoBehaviour:
@@ -13744,7 +13749,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -109, y: 18}
+  m_AnchoredPosition: {x: -109, y: 36.9}
   m_SizeDelta: {x: 1500, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1830213358
@@ -13903,8 +13908,8 @@ MonoBehaviour:
   choice2Button: {fileID: 1611344617}
   choice1Text: {fileID: 71088295}
   choice2Text: {fileID: 1582344587}
-  choice1Label: Mengaku dan minta maaf
-  choice2Label: Diam dan pura-pura tidak tahu
+  choice1Label: Mengaku
+  choice2Label: Pura-pura tidak tahu
   clickSound: {fileID: 0}
 --- !u!114 &1849865957
 MonoBehaviour:
@@ -14248,7 +14253,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -757, y: 90}
+  m_AnchoredPosition: {x: -757, y: 105}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1914022650
@@ -14335,7 +14340,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -307.0016, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -15620,6 +15625,9 @@ MonoBehaviour:
   interactionUI: {fileID: 629724584}
   dialogueManager: {fileID: 1770258341}
   triggerDialogueOnSit: 1
+  act2DialogueManager: {fileID: 0}
+  doorKnockSound: {fileID: 8300000, guid: 55a9158c889a25b4d8a1de1223c14b1b, type: 3}
+  doorKnockDelay: 4
 --- !u!65 &2119066603
 BoxCollider:
   m_ObjectHideFlags: 0

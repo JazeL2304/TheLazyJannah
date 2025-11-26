@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ChairInteraction : MonoBehaviour
 {
@@ -9,6 +9,12 @@ public class ChairInteraction : MonoBehaviour
     [Header("Dialogue Settings")]
     public Dialogue dialogueManager;
     public bool triggerDialogueOnSit = false;
+
+    [Header("🚪 ACT 2 DOOR KNOCK SETTINGS")]
+    public Act2DialogueManager act2DialogueManager;  // ← BARU
+    public AudioClip doorKnockSound;  // ← BARU
+    public float doorKnockDelay = 0.5f;  // ← BARU
+    private AudioSource audioSource;  // ← BARU
 
     void Start()
     {
@@ -24,6 +30,16 @@ public class ChairInteraction : MonoBehaviour
         if (interactionUI != null)
         {
             interactionUI.SetActive(false);
+        }
+
+        // ← BARU: Setup AudioSource
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+
+        // ← BARU: Auto-detect Act2DialogueManager
+        if (act2DialogueManager == null)
+        {
+            act2DialogueManager = FindObjectOfType<Act2DialogueManager>();
         }
 
         // Validasi
@@ -48,6 +64,12 @@ public class ChairInteraction : MonoBehaviour
 
             playerController.SitOnChair(sitPosition);
             Debug.Log("Player duduk!");
+
+            // ← BARU: CEK APAKAH PERLU PLAY DOOR KNOCK SOUND
+            if (ShouldPlayDoorKnock())
+            {
+                StartCoroutine(PlayDoorKnockAfterDelay());
+            }
 
             // TRIGGER RESUME DIALOG
             if (triggerDialogueOnSit)
@@ -85,6 +107,51 @@ public class ChairInteraction : MonoBehaviour
             }
 
             Debug.Log("=== SELESAI DUDUK ===");
+        }
+    }
+
+    // ← BARU: Function untuk cek apakah harus play door knock
+    bool ShouldPlayDoorKnock()
+    {
+        // 1. CEK APAKAH SEDANG DI ACT 2
+        if (GameProgressManager.Instance == null || GameProgressManager.Instance.currentAct != 2)
+        {
+            Debug.Log("[ChairInteraction] Not Act 2 - No door knock");
+            return false;
+        }
+
+        // 2. CEK APAKAH ACT 2 DIALOGUE MANAGER ADA DAN VALID
+        if (act2DialogueManager == null)
+        {
+            Debug.Log("[ChairInteraction] Act2DialogueManager not found - No door knock");
+            return false;
+        }
+
+        // 3. CEK APAKAH DIALOG SEDANG PAUSE (MENUNGGU PLAYER DUDUK)
+        if (!act2DialogueManager.IsPaused())
+        {
+            Debug.Log("[ChairInteraction] Act2 dialogue not paused - No door knock");
+            return false;
+        }
+
+        // 4. SEMUA KONDISI TERPENUHI!
+        Debug.Log("[ChairInteraction] ✅ All conditions met - Will play door knock!");
+        return true;
+    }
+
+    // ← BARU: Coroutine untuk play door knock dengan delay
+    System.Collections.IEnumerator PlayDoorKnockAfterDelay()
+    {
+        yield return new WaitForSeconds(doorKnockDelay);
+
+        if (doorKnockSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(doorKnockSound);
+            Debug.Log("[ChairInteraction] 🚪 DOOR KNOCK SOUND PLAYED!");
+        }
+        else
+        {
+            Debug.LogWarning("[ChairInteraction] ⚠️ Door knock sound not assigned!");
         }
     }
 
