@@ -340,6 +340,11 @@ public class Act2DialogueManager : MonoBehaviour
 
         Debug.Log("[Act2Dialogue] 📹 Starting camera rotation & NPC spawn sequence...");
 
+        // ✅ SPAWN NPCs DULU SEBELUM ROTATE!
+        SpawnNPCs();
+        yield return new WaitForSeconds(0.1f); // Delay kecil untuk ensure spawn
+
+        // Baru rotate kamera
         Transform targetTransform = playerTransform != null ? playerTransform :
                                    (playerCamera != null ? playerCamera.transform : null);
 
@@ -366,13 +371,10 @@ public class Act2DialogueManager : MonoBehaviour
             Debug.LogError("[Act2Dialogue] ❌ No transform to rotate! Assign Player Transform or Camera.");
         }
 
-        yield return new WaitForSeconds(0.3f);
-
-        SpawnNPCs();
-
+        // Start dialogue setelah rotation selesai
         if (continueDialogueAfterSpawn && postSpawnDialogues != null && postSpawnDialogues.Length > 0)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.3f);
             StartPostSpawnDialogue();
         }
 
