@@ -5,13 +5,10 @@ using System.Collections;
 
 public class Act3FightManager : MonoBehaviour
 {
-    [Header("⚔️ FIGHT UI")]
-    public GameObject fightUI; // Panel fight UI
-    public Image playerHealthBar;
-    public Image enemyHealthBar;
-    public TextMeshProUGUI playerHealthText; // "HP: 100/100"
-    public TextMeshProUGUI enemyHealthText; // "HP: 150/150"
-    public TextMeshProUGUI actionText; // Text untuk feedback aksi
+    [Header("⚔️ FIGHT UI - MINIMAL")]
+    public GameObject fightUI; // Canvas fight (TRANSPARAN!)
+    public TextMeshProUGUI actionText; // Text feedback aksi
+    public TextMeshProUGUI controlHintText; // Hint kontrol (optional)
 
     [Header("🎮 FIGHT CONTROLS")]
     public KeyCode attackKey = KeyCode.Space;
@@ -21,26 +18,22 @@ public class Act3FightManager : MonoBehaviour
     [Header("👤 PLAYER STATS")]
     public float playerMaxHealth = 100f;
     public float playerAttackDamage = 15f;
-    public float playerDefendReduction = 0.5f; // 50% damage reduction saat defend
-    public float dodgeChance = 0.7f; // 70% chance dodge berhasil
+    public float playerDefendReduction = 0.5f;
+    public float dodgeChance = 0.7f;
 
     [Header("👹 ENEMY STATS")]
     public float enemyMaxHealth = 150f;
     public float enemyAttackDamage = 20f;
-    public float enemyAttackInterval = 2f; // Musuh menyerang tiap 2 detik
+    public float enemyAttackInterval = 2f;
 
     [Header("⏱️ COOLDOWN SETTINGS")]
     public float attackCooldown = 1f;
     public float defendCooldown = 3f;
     public float dodgeCooldown = 4f;
 
-    [Header("📊 UI COOLDOWN INDICATORS")]
-    public Image attackCooldownFill;
-    public Image defendCooldownFill;
-    public Image dodgeCooldownFill;
-    public TextMeshProUGUI attackKeyText;
-    public TextMeshProUGUI defendKeyText;
-    public TextMeshProUGUI dodgeKeyText;
+    [Header("🎭 ANIMATION REFERENCES")]
+    public Animator playerAnimator; // Player animator
+    public Animator enemyAnimator; // Enemy animator
 
     [Header("🔊 SOUND EFFECTS")]
     public AudioClip attackSound;
@@ -51,31 +44,43 @@ public class Act3FightManager : MonoBehaviour
     private AudioSource audioSource;
 
     [Header("🎬 ENDING SETTINGS")]
-    public GameObject victoryPanel; // Panel kalo player menang
-    public GameObject defeatPanel; // Panel kalo player kalah
-    public string nextSceneName = "Main Menu"; // Scene setelah fight
+    public GameObject victoryPanel;
+    public GameObject defeatPanel;
+    public string nextSceneName = "Main Menu";
 
     [Header("📹 CAMERA SHAKE")]
     public bool enableCameraShake = true;
     public float shakeIntensity = 0.1f;
     public float shakeDuration = 0.2f;
 
+    // INTERNAL STATE
     private float playerCurrentHealth;
     private float enemyCurrentHealth;
     private bool isDefending = false;
+    private bool isDodging = false;
     private bool fightActive = false;
 
-    // Cooldown timers
+    // COOLDOWN TIMERS
     private float attackCooldownTimer = 0f;
     private float defendCooldownTimer = 0f;
     private float dodgeCooldownTimer = 0f;
     private float enemyAttackTimer = 0f;
 
+    // CAMERA
     private Camera mainCamera;
     private Vector3 originalCameraPos;
 
+    // ANIMATION PARAMETERS (Standard Mecanim)
+    private const string ANIM_ATTACK = "Attack";
+    private const string ANIM_DEFEND = "Defend";
+    private const string ANIM_DODGE = "Dodge";
+    private const string ANIM_HIT = "Hit";
+    private const string ANIM_DEATH = "Death";
+    private const string ANIM_IDLE = "Idle";
+
     void Start()
     {
+        // Setup audio
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -83,21 +88,36 @@ public class Act3FightManager : MonoBehaviour
         }
         audioSource.playOnAwake = false;
 
+        // Setup camera
         mainCamera = Camera.main;
         if (mainCamera != null)
         {
             originalCameraPos = mainCamera.transform.localPosition;
         }
 
-        // Hide all UI at start
+        // Auto-detect animators
+        if (playerAnimator == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                playerAnimator = player.GetComponentInChildren<Animator>();
+            }
+        }
+
+        if (enemyAnimator == null)
+        {
+            GameObject enemy = GameObject.Find("DebtCollector"); // Adjust nama
+            if (enemy != null)
+            {
+                enemyAnimator = enemy.GetComponentInChildren<Animator>();
+            }
+        }
+
+        // Hide UI
         if (fightUI != null) fightUI.SetActive(false);
         if (victoryPanel != null) victoryPanel.SetActive(false);
         if (defeatPanel != null) defeatPanel.SetActive(false);
-
-        // Setup key text labels
-        if (attackKeyText != null) attackKeyText.text = $"[{attackKey}] ATTACK";
-        if (defendKeyText != null) defendKeyText.text = $"[{defendKey}] DEFEND";
-        if (dodgeKeyText != null) dodgeKeyText.text = $"[{dodgeKey}] DODGE";
 
         Debug.Log("[Act3Fight] Fight system initialized!");
     }
@@ -106,27 +126,10 @@ public class Act3FightManager : MonoBehaviour
     {
         if (!fightActive) return;
 
-        // Update cooldown timers
-        if (attackCooldownTimer > 0)
-        {
-            attackCooldownTimer -= Time.deltaTime;
-            if (attackCooldownFill != null)
-                attackCooldownFill.fillAmount = attackCooldownTimer / attackCooldown;
-        }
-
-        if (defendCooldownTimer > 0)
-        {
-            defendCooldownTimer -= Time.deltaTime;
-            if (defendCooldownFill != null)
-                defendCooldownFill.fillAmount = defendCooldownTimer / defendCooldown;
-        }
-
-        if (dodgeCooldownTimer > 0)
-        {
-            dodgeCooldownTimer -= Time.deltaTime;
-            if (dodgeCooldownFill != null)
-                dodgeCooldownFill.fillAmount = dodgeCooldownTimer / dodgeCooldown;
-        }
+        // Update cooldowns
+        if (attackCooldownTimer > 0) attackCooldownTimer -= Time.deltaTime;
+        if (defendCooldownTimer > 0) defendCooldownTimer -= Time.deltaTime;
+        if (dodgeCooldownTimer > 0) dodgeCooldownTimer -= Time.deltaTime;
 
         // Player input
         if (Input.GetKeyDown(attackKey) && attackCooldownTimer <= 0)
@@ -151,6 +154,13 @@ public class Act3FightManager : MonoBehaviour
             EnemyAttack();
             enemyAttackTimer = 0f;
         }
+
+        // Reset defend state
+        if (isDefending)
+        {
+            // Defend hanya berlaku untuk 1 attack berikutnya
+            // Logic sudah handled di EnemyAttack()
+        }
     }
 
     public void StartFight()
@@ -161,15 +171,19 @@ public class Act3FightManager : MonoBehaviour
         playerCurrentHealth = playerMaxHealth;
         enemyCurrentHealth = enemyMaxHealth;
 
-        // Show fight UI
+        // Show UI
         if (fightUI != null)
         {
             fightUI.SetActive(true);
         }
 
-        UpdateHealthUI();
+        // Show control hint
+        if (controlHintText != null)
+        {
+            controlHintText.text = "[SPACE] Attack | [SHIFT] Defend | [Q] Dodge";
+        }
 
-        // Enable player control (cursor visible untuk UI)
+        // Cursor control
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -177,14 +191,25 @@ public class Act3FightManager : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            PlayerController playerController = player.GetComponent<PlayerController>();
-            if (playerController != null)
+            PlayerController controller = player.GetComponent<PlayerController>();
+            if (controller != null)
             {
-                playerController.enabled = false;
+                controller.enabled = false;
             }
         }
 
-        ShowActionText("FIGHT START! Defend yourself!", Color.yellow);
+        // Set animators to idle/combat stance
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(ANIM_IDLE);
+        }
+
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger(ANIM_IDLE);
+        }
+
+        ShowActionText("FIGHT START!", Color.yellow, 2f);
 
         Debug.Log("[Act3Fight] ⚔️ FIGHT STARTED!");
     }
@@ -193,9 +218,22 @@ public class Act3FightManager : MonoBehaviour
     {
         attackCooldownTimer = attackCooldown;
 
-        // Deal damage to enemy
+        // PLAY ANIMATION
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(ANIM_ATTACK);
+        }
+
+        // Deal damage
         enemyCurrentHealth -= playerAttackDamage;
 
+        // PLAY HIT ANIMATION ON ENEMY
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger(ANIM_HIT);
+        }
+
+        // Sound & effects
         if (attackSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(attackSound);
@@ -206,11 +244,10 @@ public class Act3FightManager : MonoBehaviour
             StartCoroutine(CameraShake());
         }
 
-        ShowActionText($"You ATTACK! Dealt {playerAttackDamage} damage!", Color.red);
+        ShowActionText($"You ATTACK! -{playerAttackDamage} HP", Color.red, 1.5f);
 
         Debug.Log($"[Act3Fight] Player attacked! Enemy HP: {enemyCurrentHealth}/{enemyMaxHealth}");
 
-        UpdateHealthUI();
         CheckFightEnd();
     }
 
@@ -219,17 +256,23 @@ public class Act3FightManager : MonoBehaviour
         defendCooldownTimer = defendCooldown;
         isDefending = true;
 
+        // PLAY ANIMATION
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(ANIM_DEFEND);
+        }
+
         if (defendSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(defendSound);
         }
 
-        ShowActionText("DEFENDING! Damage reduced!", Color.blue);
+        ShowActionText("DEFENDING! Damage reduced 50%", Color.cyan, 1.5f);
 
         Debug.Log("[Act3Fight] Player defending!");
 
-        // Reset defend after 1 second
-        Invoke("ResetDefend", 1f);
+        // Reset defend after next attack atau timeout
+        Invoke("ResetDefend", 2f);
     }
 
     void ResetDefend()
@@ -246,17 +289,25 @@ public class Act3FightManager : MonoBehaviour
         if (random <= dodgeChance)
         {
             // Dodge successful
+            isDodging = true;
+
+            // PLAY ANIMATION
+            if (playerAnimator != null)
+            {
+                playerAnimator.SetTrigger(ANIM_DODGE);
+            }
+
             if (dodgeSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(dodgeSound);
             }
 
-            ShowActionText("DODGE SUCCESS! Next attack will miss!", Color.green);
+            ShowActionText("DODGE SUCCESS! Next attack will MISS!", Color.green, 1.5f);
 
             Debug.Log("[Act3Fight] Dodge successful!");
 
-            // Set flag untuk skip next enemy attack
-            StartCoroutine(DodgeWindow());
+            // Set window untuk dodge next attack
+            Invoke("ResetDodge", 2f);
         }
         else
         {
@@ -266,51 +317,54 @@ public class Act3FightManager : MonoBehaviour
                 audioSource.PlayOneShot(missSound);
             }
 
-            ShowActionText("DODGE FAILED!", Color.gray);
+            ShowActionText("DODGE FAILED!", Color.gray, 1f);
 
             Debug.Log("[Act3Fight] Dodge failed!");
         }
     }
 
-    IEnumerator DodgeWindow()
+    void ResetDodge()
     {
-        bool dodging = true;
-
-        // Window untuk dodge (1 detik)
-        float timer = 0f;
-        while (timer < 1f)
-        {
-            if (enemyAttackTimer >= enemyAttackInterval && dodging)
-            {
-                // Skip enemy attack
-                enemyAttackTimer = 0f;
-                dodging = false;
-
-                ShowActionText("Enemy attack DODGED!", Color.green);
-                Debug.Log("[Act3Fight] Enemy attack dodged!");
-            }
-
-            timer += Time.deltaTime;
-            yield return null;
-        }
+        isDodging = false;
     }
 
     void EnemyAttack()
     {
+        // PLAY ATTACK ANIMATION
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger(ANIM_ATTACK);
+        }
+
+        // Check if player dodging
+        if (isDodging)
+        {
+            ShowActionText("Enemy attack DODGED!", Color.green, 1.5f);
+            isDodging = false;
+            return;
+        }
+
         float damage = enemyAttackDamage;
 
         // Check if player defending
         if (isDefending)
         {
             damage *= playerDefendReduction;
-            ShowActionText($"Enemy attacked! Blocked {(int)(enemyAttackDamage * (1 - playerDefendReduction))} damage!", Color.cyan);
+            ShowActionText($"Enemy attack BLOCKED! -{damage} HP", Color.cyan, 1.5f);
+            isDefending = false; // Consume defend
         }
         else
         {
-            ShowActionText($"Enemy HIT YOU for {damage} damage!", new Color(1f, 0.5f, 0f)); // Orange
+            ShowActionText($"Enemy HIT YOU! -{damage} HP", new Color(1f, 0.5f, 0f), 1.5f);
         }
 
         playerCurrentHealth -= damage;
+
+        // PLAY HIT ANIMATION ON PLAYER
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(ANIM_HIT);
+        }
 
         if (hitSound != null && audioSource != null)
         {
@@ -324,33 +378,7 @@ public class Act3FightManager : MonoBehaviour
 
         Debug.Log($"[Act3Fight] Enemy attacked! Player HP: {playerCurrentHealth}/{playerMaxHealth}");
 
-        UpdateHealthUI();
         CheckFightEnd();
-    }
-
-    void UpdateHealthUI()
-    {
-        // Player health bar
-        if (playerHealthBar != null)
-        {
-            playerHealthBar.fillAmount = playerCurrentHealth / playerMaxHealth;
-        }
-
-        if (playerHealthText != null)
-        {
-            playerHealthText.text = $"HP: {(int)playerCurrentHealth}/{(int)playerMaxHealth}";
-        }
-
-        // Enemy health bar
-        if (enemyHealthBar != null)
-        {
-            enemyHealthBar.fillAmount = enemyCurrentHealth / enemyMaxHealth;
-        }
-
-        if (enemyHealthText != null)
-        {
-            enemyHealthText.text = $"HP: {(int)enemyCurrentHealth}/{(int)enemyMaxHealth}";
-        }
     }
 
     void CheckFightEnd()
@@ -369,6 +397,12 @@ public class Act3FightManager : MonoBehaviour
     {
         fightActive = false;
 
+        // PLAY DEATH ANIMATION ON ENEMY
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger(ANIM_DEATH);
+        }
+
         Debug.Log("[Act3Fight] 🎉 PLAYER WINS!");
 
         if (fightUI != null)
@@ -381,15 +415,20 @@ public class Act3FightManager : MonoBehaviour
             victoryPanel.SetActive(true);
         }
 
-        ShowActionText("VICTORY! You defeated the debt collector!", Color.green);
+        ShowActionText("VICTORY! You survived!", Color.green, 5f);
 
-        // Auto load next scene after 5 seconds
         Invoke("LoadNextScene", 5f);
     }
 
     void Defeat()
     {
         fightActive = false;
+
+        // PLAY DEATH ANIMATION ON PLAYER
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(ANIM_DEATH);
+        }
 
         Debug.Log("[Act3Fight] 💀 PLAYER DEFEATED!");
 
@@ -403,15 +442,14 @@ public class Act3FightManager : MonoBehaviour
             defeatPanel.SetActive(true);
         }
 
-        ShowActionText("DEFEATED... You were taken away...", Color.red);
+        ShowActionText("DEFEATED... You were taken away...", Color.red, 5f);
 
-        // Auto restart or load game over scene
         Invoke("RestartFight", 5f);
     }
 
     void LoadNextScene()
     {
-        Debug.Log("[Act3Fight] Loading next scene: " + nextSceneName);
+        Debug.Log("[Act3Fight] Loading: " + nextSceneName);
         UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
     }
 
@@ -419,34 +457,31 @@ public class Act3FightManager : MonoBehaviour
     {
         Debug.Log("[Act3Fight] Restarting fight...");
 
-        // Hide defeat panel
         if (defeatPanel != null)
         {
             defeatPanel.SetActive(false);
         }
 
-        // Restart fight
         StartFight();
     }
 
-    void ShowActionText(string message, Color color)
+    void ShowActionText(string message, Color color, float duration)
     {
         if (actionText != null)
         {
             actionText.text = message;
             actionText.color = color;
 
-            // Fade out after 2 seconds
             StopCoroutine("FadeActionText");
-            StartCoroutine(FadeActionText());
+            StartCoroutine(FadeActionText(duration));
         }
 
         Debug.Log("[Act3Fight] " + message);
     }
 
-    IEnumerator FadeActionText()
+    IEnumerator FadeActionText(float duration)
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(duration);
 
         if (actionText != null)
         {
@@ -483,7 +518,6 @@ public class Act3FightManager : MonoBehaviour
         mainCamera.transform.localPosition = originalCameraPos;
     }
 
-    // Manual trigger untuk testing
     public void ManualStartFight()
     {
         StartFight();

@@ -5,16 +5,16 @@ using System.Collections;
 public class Act3DoorEventManager : MonoBehaviour
 {
     [Header("🚪 DOOR REFERENCE")]
-    public DoorInteraction targetDoor; // Pintu yang harus dibuka
+    public DoorInteraction targetDoor;
 
     [Header("👻 CHARACTER SPAWN SETTINGS")]
-    public GameObject mysteriousCharacter; // Karakter yang akan muncul
-    public Transform spawnPoint; // Posisi spawn karakter
-    public bool characterStartsHidden = true; // Karakter hidden di awal?
+    public GameObject mysteriousCharacter;
+    public Transform spawnPoint;
+    public bool characterStartsHidden = true;
 
     [Header("⏱️ SPAWN TIMING")]
-    public float delayBeforeSpawn = 0.5f; // Delay setelah pintu dibuka
-    public float fadeInDuration = 1f; // Durasi fade in (opsional)
+    public float delayBeforeSpawn = 0.5f;
+    public float fadeInDuration = 1f;
 
     [Header("💬 DIALOGUE AFTER SPAWN")]
     public GameObject dialogueBox;
@@ -23,9 +23,9 @@ public class Act3DoorEventManager : MonoBehaviour
     public float textSpeed = 0.05f;
 
     [Header("🔊 AUDIO SETTINGS")]
-    public AudioClip doorOpenSound; // SFX pintu buka
-    public AudioClip characterAppearSound; // SFX karakter muncul (scream/footstep)
-    public AudioClip clickSound; // SFX click dialogue
+    public AudioClip doorOpenSound;
+    public AudioClip characterAppearSound;
+    public AudioClip clickSound;
     private AudioSource audioSource;
 
     [System.Serializable]
@@ -92,9 +92,9 @@ public class Act3DoorEventManager : MonoBehaviour
     [Header("🎯 OBJECTIVE COMPLETION")]
     public Act3ObjectiveManager objectiveManager;
 
-    [Header("⚔️ FIGHT SYSTEM")]
-    public Act3FightManager fightManager; // Reference ke fight system
-    public bool startFightAfterDialogue = true; // Auto start fight setelah dialog?
+    [Header("🏃 CHASE SYSTEM")]
+    public Act3ChaseManager chaseManager;
+    public bool startChaseAfterDialogue = true;
 
     private bool doorOpened = false;
     private bool characterSpawned = false;
@@ -104,7 +104,6 @@ public class Act3DoorEventManager : MonoBehaviour
 
     void Start()
     {
-        // Setup AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -112,7 +111,6 @@ public class Act3DoorEventManager : MonoBehaviour
         }
         audioSource.playOnAwake = false;
 
-        // Auto-detect door
         if (targetDoor == null)
         {
             targetDoor = FindObjectOfType<DoorInteraction>();
@@ -122,19 +120,21 @@ public class Act3DoorEventManager : MonoBehaviour
             }
         }
 
-        // Auto-detect objective manager
         if (objectiveManager == null)
         {
             objectiveManager = FindObjectOfType<Act3ObjectiveManager>();
         }
 
-        // Hide dialogue box
+        if (chaseManager == null)
+        {
+            chaseManager = FindObjectOfType<Act3ChaseManager>();
+        }
+
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
         }
 
-        // Setup character
         if (mysteriousCharacter != null && characterStartsHidden)
         {
             mysteriousCharacter.SetActive(false);
@@ -146,20 +146,17 @@ public class Act3DoorEventManager : MonoBehaviour
 
     void Update()
     {
-        // Check if door opened
         if (!doorOpened && targetDoor != null && targetDoor.isOpen)
         {
             OnDoorOpened();
         }
 
-        // Dialogue input
         if (dialogueActive && Input.GetMouseButtonDown(0))
         {
             PlayClickSound();
 
             if (isTyping)
             {
-                // Skip typing
                 StopAllCoroutines();
                 dialogueText.text = characterDialogues[currentLine].text;
                 isTyping = false;
@@ -177,26 +174,22 @@ public class Act3DoorEventManager : MonoBehaviour
 
         Debug.Log("[Act3DoorEvent] 🚪 PINTU DIBUKA! Starting spawn sequence...");
 
-        // DISABLE DOOR INTERACTION!
         if (targetDoor != null && targetDoor.interactionUI != null)
         {
             targetDoor.interactionUI.SetActive(false);
             Debug.Log("[Act3DoorEvent] ✅ Door interaction UI disabled!");
         }
 
-        // Play door sound
         if (doorOpenSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(doorOpenSound);
         }
 
-        // Start spawn sequence
         StartCoroutine(SpawnCharacterSequence());
     }
 
     IEnumerator SpawnCharacterSequence()
     {
-        // Hide objective panel
         if (objectiveManager != null)
         {
             objectiveManager.ForceCompleteObjective();
@@ -206,10 +199,8 @@ public class Act3DoorEventManager : MonoBehaviour
 
         Debug.Log("[Act3DoorEvent] 👻 SPAWNING CHARACTER...");
 
-        // Spawn/show character
         if (mysteriousCharacter != null)
         {
-            // Set position if spawn point provided
             if (spawnPoint != null)
             {
                 mysteriousCharacter.transform.position = spawnPoint.position;
@@ -218,7 +209,6 @@ public class Act3DoorEventManager : MonoBehaviour
 
             mysteriousCharacter.SetActive(true);
 
-            // Play appear sound
             if (characterAppearSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(characterAppearSound);
@@ -233,7 +223,6 @@ public class Act3DoorEventManager : MonoBehaviour
 
         characterSpawned = true;
 
-        // Wait a bit, then start dialogue
         yield return new WaitForSeconds(1f);
 
         StartDialogue();
@@ -251,11 +240,9 @@ public class Act3DoorEventManager : MonoBehaviour
             dialogueBox.SetActive(true);
         }
 
-        // Unlock cursor for dialogue
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Disable player movement
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -316,17 +303,12 @@ public class Act3DoorEventManager : MonoBehaviour
 
         Debug.Log("[Act3DoorEvent] ✅ Dialogue finished!");
 
-        // START FIGHT SYSTEM!
-        if (startFightAfterDialogue && fightManager != null)
+        // START CHASE SYSTEM!
+        if (startChaseAfterDialogue && chaseManager != null)
         {
-            Debug.Log("[Act3DoorEvent] ⚔️ STARTING FIGHT SYSTEM!");
-            fightManager.StartFight();
-        }
-        else if (startFightAfterDialogue && fightManager == null)
-        {
-            Debug.LogError("[Act3DoorEvent] ❌ Fight Manager not assigned!");
+            Debug.Log("[Act3DoorEvent] 🏃 STARTING CHASE SYSTEM!");
 
-            // Re-enable player as fallback
+            // Re-enable player movement for chase
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
             {
@@ -339,6 +321,12 @@ public class Act3DoorEventManager : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            chaseManager.StartChase();
+        }
+        else if (startChaseAfterDialogue && chaseManager == null)
+        {
+            Debug.LogError("[Act3DoorEvent] ❌ Chase Manager not assigned!");
         }
     }
 
@@ -350,7 +338,6 @@ public class Act3DoorEventManager : MonoBehaviour
         }
     }
 
-    // Manual trigger untuk testing
     public void ManualTriggerSpawn()
     {
         if (!characterSpawned)
