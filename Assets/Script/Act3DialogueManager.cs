@@ -16,6 +16,7 @@ public class Act3DialogueManager : MonoBehaviour
 
     [Header("🔊 Audio Settings")]
     public AudioClip clickSound;
+    public AudioClip doorKnockSound; // ← BARU - SFX pintu ketok!
     private AudioSource audioSource;
 
     [System.Serializable]
@@ -55,9 +56,35 @@ public class Act3DialogueManager : MonoBehaviour
         }
     };
 
+    [Header("🚪 DOOR KNOCK CONTINUATION DIALOGUE")]
+    public DialogueLine[] doorKnockDialogues = new DialogueLine[]
+    {
+        new DialogueLine {
+            characterName = "JANNAH",
+            text = "Hah? Ada yang ketok pintu?"
+        },
+        new DialogueLine {
+            characterName = "JANNAH",
+            text = "Mama? Papa? Kalian pulang?"
+        },
+        new DialogueLine {
+            characterName = "JANNAH",
+            text = "..."
+        },
+        new DialogueLine {
+            characterName = "JANNAH",
+            text = "Atau... itu bukan mereka?"
+        }
+    };
+
+    [Header("⏳ DOOR KNOCK TIMING")]
+    public float delayBeforeDoorKnock = 1f; // Delay sebelum pintu ketok
+    public float delayAfterDoorKnock = 1.5f; // Delay setelah sound selesai
+
     private int currentLine = 0;
     private bool isTyping = false;
     private bool dialogueActive = false;
+    private bool isFirstDialogueComplete = false; // Track dialog pertama selesai
 
     void Start()
     {
@@ -114,7 +141,11 @@ public class Act3DialogueManager : MonoBehaviour
             {
                 // Skip typing animation
                 StopAllCoroutines();
-                dialogueText.text = act3Dialogues[currentLine].text;
+
+                // Cek apakah masih dialog pertama atau kedua
+                DialogueLine[] currentDialogues = isFirstDialogueComplete ? doorKnockDialogues : act3Dialogues;
+                dialogueText.text = currentDialogues[currentLine].text;
+
                 isTyping = false;
             }
             else
@@ -129,6 +160,7 @@ public class Act3DialogueManager : MonoBehaviour
     {
         dialogueActive = true;
         currentLine = 0;
+        isFirstDialogueComplete = false;
 
         if (dialogueBox != null)
         {
@@ -148,7 +180,9 @@ public class Act3DialogueManager : MonoBehaviour
         isTyping = true;
         dialogueText.text = "";
 
-        DialogueLine line = act3Dialogues[currentLine];
+        // Pilih array dialog yang sesuai
+        DialogueLine[] currentDialogues = isFirstDialogueComplete ? doorKnockDialogues : act3Dialogues;
+        DialogueLine line = currentDialogues[currentLine];
 
         if (nameText != null)
         {
@@ -168,14 +202,73 @@ public class Act3DialogueManager : MonoBehaviour
     {
         currentLine++;
 
-        if (currentLine < act3Dialogues.Length)
+        // Pilih array dialog yang sesuai
+        DialogueLine[] currentDialogues = isFirstDialogueComplete ? doorKnockDialogues : act3Dialogues;
+
+        if (currentLine < currentDialogues.Length)
         {
             StartCoroutine(TypeLine());
         }
         else
         {
-            EndDialogue();
+            // Cek apakah ini dialog pertama atau kedua yang selesai
+            if (!isFirstDialogueComplete)
+            {
+                // Dialog pertama selesai → trigger door knock sequence
+                StartCoroutine(DoorKnockSequence());
+            }
+            else
+            {
+                // Dialog kedua selesai → end dialogue
+                EndDialogue();
+            }
         }
+    }
+
+    IEnumerator DoorKnockSequence()
+    {
+        dialogueActive = false;
+
+        // Hide dialogue box sementara
+        if (dialogueBox != null)
+        {
+            dialogueBox.SetActive(false);
+        }
+
+        Debug.Log("[Act3Dialogue] 🚪 First dialogue complete! Starting door knock sequence...");
+
+        // Delay sebelum ketok pintu
+        yield return new WaitForSeconds(delayBeforeDoorKnock);
+
+        // PLAY DOOR KNOCK SOUND!
+        if (doorKnockSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(doorKnockSound);
+            Debug.Log("[Act3Dialogue] 🚪 DOOR KNOCK SOUND PLAYED!");
+
+            // Tunggu sound selesai + delay tambahan
+            float soundLength = doorKnockSound.length;
+            yield return new WaitForSeconds(soundLength + delayAfterDoorKnock);
+        }
+        else
+        {
+            Debug.LogWarning("[Act3Dialogue] ⚠️ Door knock sound not assigned!");
+            yield return new WaitForSeconds(delayAfterDoorKnock);
+        }
+
+        // Start dialog kedua (Jannah mengira orang tuanya balik)
+        Debug.Log("[Act3Dialogue] 💬 Starting continuation dialogue...");
+
+        isFirstDialogueComplete = true;
+        currentLine = 0;
+        dialogueActive = true;
+
+        if (dialogueBox != null)
+        {
+            dialogueBox.SetActive(true);
+        }
+
+        StartCoroutine(TypeLine());
     }
 
     void EndDialogue()
@@ -191,7 +284,7 @@ public class Act3DialogueManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        Debug.Log("[Act3Dialogue] Dialogue finished!");
+        Debug.Log("[Act3Dialogue] All dialogues finished!");
     }
 
     void PlayClickSound()
