@@ -65,16 +65,13 @@ public class Act2ChoiceManager : MonoBehaviour
         new DialogueLine { speaker = "PAPA", text = "Sudah Ma... Biarkan dia sendiri dulu. Ayo kita keluar." }
     };
 
-    // Di bagian Header "📱 PHONE EVIDENCE (ROUTE 2)" (sekitar line 40-50)
-    // Tambahkan variable baru:
-
     [Header("📱 PHONE EVIDENCE (ROUTE 2)")]
-    public GameObject phoneEvidencePrefab; // Prefab HP yang muncul
-    public Transform cameraTransform; // Camera untuk posisi HP
-    public Vector3 phoneOffset = new Vector3(0f, -0.2f, 0.5f); // Offset dari kamera
-    public Vector3 phoneRotation = new Vector3(0f, 180f, 0f); // Rotasi HP
-    public float phoneDisplayDuration = 3f; // Berapa lama HP muncul (detik)
-    public int showPhoneAtLineIndex = 1; // Line "Jannah, kita sudah dapat buktinya..."
+    public GameObject phoneEvidencePrefab;
+    public Transform cameraTransform;
+    public Vector3 phoneOffset = new Vector3(0f, -0.2f, 0.5f);
+    public Vector3 phoneRotation = new Vector3(0f, 180f, 0f);
+    public float phoneDisplayDuration = 3f;
+    public int showPhoneAtLineIndex = 1;
     private GameObject currentPhoneEvidence;
 
     [Header("🎬 GOOD ENDING PANEL (ROUTE 1 ONLY)")]
@@ -88,6 +85,10 @@ public class Act2ChoiceManager : MonoBehaviour
     public float endingDisplayTime = 8f;
     public string mainMenuSceneName = "Main Menu";
 
+    [Header("🎬 BAD ENDING PANEL (ROUTE 2)")]
+    public GameObject badEndingPanel; // ← BARU - Canvas Act 2 End
+    public float badEndingDisplayTime = 5f; // ← BARU - Berapa lama canvas muncul
+
     [Header("⏭️ ACT 3 PROGRESSION (ROUTE 2)")]
     public bool loadAct3AfterLieDialogue = true;
     public float delayBeforeAct3 = 2f;
@@ -96,7 +97,7 @@ public class Act2ChoiceManager : MonoBehaviour
     public int act3Day = 60;
 
     [Header("🧹 CLEANUP QUEST (ROUTE 1)")]
-    public int pauseAtLineIndex = 9; // Line "Baik Pa" (index 9)
+    public int pauseAtLineIndex = 9;
     public TrashCleanupManager cleanupManager;
 
     private bool choiceShown = false;
@@ -138,7 +139,12 @@ public class Act2ChoiceManager : MonoBehaviour
             goodEndingPanel.SetActive(false);
         }
 
-        // AUTO-DETECT CLEANUP MANAGER
+        // ← BARU - Hide bad ending panel
+        if (badEndingPanel != null)
+        {
+            badEndingPanel.SetActive(false);
+        }
+
         if (cleanupManager == null)
         {
             cleanupManager = FindObjectOfType<TrashCleanupManager>();
@@ -148,7 +154,6 @@ public class Act2ChoiceManager : MonoBehaviour
             }
         }
 
-        // AUTO-DETECT CAMERA (tambahkan sebelum Debug.Log terakhir)
         if (cameraTransform == null)
         {
             cameraTransform = Camera.main.transform;
@@ -163,14 +168,11 @@ public class Act2ChoiceManager : MonoBehaviour
 
     void Update()
     {
-        // CHECK IF PAUSED FOR CLEANUP
         if (isPausedForCleanup)
         {
-            // Wait until cleanup quest is complete
             if (cleanupManager != null && cleanupManager.IsQuestComplete())
             {
-                // Do nothing, waiting for player to interact with parents
-                // ParentNPCInteraction will call ShowGoodEndingAfterCleanup()
+                // Waiting for parent interaction
             }
             return;
         }
@@ -249,38 +251,22 @@ public class Act2ChoiceManager : MonoBehaviour
     void StartDialogueSequence()
     {
         Debug.Log("[Act2Choice] 🎭 StartDialogueSequence() CALLED!");
-        Debug.Log($"[Act2Choice] This GameObject active: {gameObject.activeInHierarchy}");
-        Debug.Log($"[Act2Choice] This GameObject name: {gameObject.name}");
 
         currentDialogueLine = 0;
         dialogueActive = true;
-        isPausedForCleanup = false; // Reset pause flag
+        isPausedForCleanup = false;
 
         if (dialogueBox != null)
         {
-            Debug.Log($"[Act2Choice] DialogueBox found: {dialogueBox.name}");
             dialogueBox.SetActive(true);
-            Debug.Log("[Act2Choice] DialogueBox activated!");
-        }
-        else
-        {
-            Debug.LogError("[Act2Choice] ❌ DialogueBox is NULL!");
-            return;
         }
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        Debug.Log($"[Act2Choice] Starting {(isHonestRoute ? "HONEST" : "LIE")} dialogue sequence...");
-
         if (gameObject.activeInHierarchy)
         {
             StartCoroutine(TypeDialogueLine());
-            Debug.Log("[Act2Choice] ✅ Coroutine started successfully!");
-        }
-        else
-        {
-            Debug.LogError("[Act2Choice] ❌ Cannot start coroutine - GameObject is inactive!");
         }
     }
 
@@ -297,7 +283,6 @@ public class Act2ChoiceManager : MonoBehaviour
             dialogueNameText.text = currentLine.speaker;
         }
 
-        // ✅ SHOW PHONE EVIDENCE SAAT LINE BUKTI (ROUTE 2 ONLY)
         if (!isHonestRoute && currentDialogueLine == showPhoneAtLineIndex)
         {
             ShowPhoneEvidence();
@@ -314,13 +299,11 @@ public class Act2ChoiceManager : MonoBehaviour
 
     void NextDialogueLine()
     {
-        // ✅ HIDE PHONE EVIDENCE SAAT NEXT LINE
         if (currentPhoneEvidence != null)
         {
             HidePhoneEvidence();
         }
 
-        // CHECK FOR CLEANUP PAUSE (ROUTE 1 ONLY)
         if (isHonestRoute && currentDialogueLine == pauseAtLineIndex)
         {
             Debug.Log("[Act2Choice] 🛑 PAUSE untuk beresin kamar!");
@@ -328,24 +311,17 @@ public class Act2ChoiceManager : MonoBehaviour
             isPausedForCleanup = true;
             dialogueActive = false;
 
-            // Hide dialogue box
             if (dialogueBox != null)
             {
                 dialogueBox.SetActive(false);
             }
 
-            // Unlock cursor untuk gameplay
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            // Start cleanup quest
             if (cleanupManager != null)
             {
                 cleanupManager.StartCleanupQuest();
-            }
-            else
-            {
-                Debug.LogError("[Act2Choice] ❌ TrashCleanupManager not assigned!");
             }
 
             return;
@@ -378,15 +354,13 @@ public class Act2ChoiceManager : MonoBehaviour
 
         if (isHonestRoute)
         {
-            // ROUTE 1: Seharusnya tidak sampai sini karena ada pause
-            // Tapi jika sampai sini (tidak ada cleanup quest), langsung good ending
             Debug.LogWarning("[Act2Choice] Honest route finished without cleanup quest!");
             ShowGoodEnding();
         }
         else
         {
-            // ROUTE 2: LANJUT KE ACT 3
-            PrepareAct3Transition();
+            // ← BARU - ROUTE 2: Tampilkan Bad Ending Canvas dulu sebelum Act 3
+            ShowBadEndingCanvas();
         }
     }
 
@@ -397,15 +371,12 @@ public class Act2ChoiceManager : MonoBehaviour
         if (goodEndingPanel != null)
         {
             goodEndingPanel.SetActive(true);
-            Debug.Log("[Act2Choice] ✅ Good Ending Panel displayed!");
 
-            // Play music jika ada
             if (goodEndingMusic != null && audioSource != null)
             {
                 audioSource.clip = goodEndingMusic;
                 audioSource.loop = true;
                 audioSource.Play();
-                Debug.Log("[Act2Choice] 🎵 Good Ending Music playing!");
             }
 
             if (loadMainMenuAfterEnding)
@@ -413,24 +384,57 @@ public class Act2ChoiceManager : MonoBehaviour
                 StartCoroutine(LoadMainMenuAfterDelay());
             }
         }
+    }
+
+    // ← BARU - Function untuk tampilkan Bad Ending Canvas
+    void ShowBadEndingCanvas()
+    {
+        Debug.Log("[Act2Choice] 🎬 SHOWING BAD ENDING CANVAS - ACT 2 END!");
+
+        if (badEndingPanel != null)
+        {
+            badEndingPanel.SetActive(true);
+            Debug.Log("[Act2Choice] ✅ Bad Ending Canvas displayed!");
+
+            // Cursor tetap visible buat baca canvas
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            // Setelah beberapa detik, lanjut ke Act 3
+            StartCoroutine(WaitThenPrepareAct3());
+        }
         else
         {
-            Debug.LogError("[Act2Choice] ❌ Good Ending Panel not assigned!");
+            Debug.LogWarning("[Act2Choice] ⚠️ Bad Ending Panel not assigned! Langsung ke Act 3...");
+            PrepareAct3Transition();
         }
     }
 
-    // 🆕 FUNCTION BARU - Dipanggil dari ParentNPCInteraction setelah cleanup quest
+    // ← BARU - Coroutine tunggu canvas, lalu ke Act 3
+    IEnumerator WaitThenPrepareAct3()
+    {
+        Debug.Log($"[Act2Choice] Waiting {badEndingDisplayTime} seconds before Act 3...");
+        yield return new WaitForSeconds(badEndingDisplayTime);
+
+        // Hide canvas
+        if (badEndingPanel != null)
+        {
+            badEndingPanel.SetActive(false);
+        }
+
+        // Lanjut ke Act 3
+        PrepareAct3Transition();
+    }
+
     public void ShowGoodEndingAfterCleanup()
     {
         Debug.Log("[Act2Choice] 🎉 Cleanup quest selesai! Showing Good Ending...");
 
-        // Hide any remaining UI
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
         }
 
-        // Show good ending
         ShowGoodEnding();
     }
 
@@ -438,24 +442,15 @@ public class Act2ChoiceManager : MonoBehaviour
     {
         Debug.Log("[Act2Choice] ⏭️ PREPARING ACT 3 TRANSITION...");
 
-        // Set progress ke Act 3
         if (GameProgressManager.Instance != null)
         {
             GameProgressManager.Instance.SetProgress(act3Number, act3Day);
             Debug.Log($"[Act2Choice] ✅ Progress set to ACT {act3Number} DAY {act3Day}");
         }
-        else
-        {
-            Debug.LogWarning("[Act2Choice] ⚠️ GameProgressManager not found!");
-        }
 
         if (loadAct3AfterLieDialogue)
         {
             StartCoroutine(LoadAct3AfterDelay());
-        }
-        else
-        {
-            Debug.Log("[Act2Choice] Auto-load Act 3 disabled. Waiting for manual trigger.");
         }
     }
 
@@ -467,7 +462,6 @@ public class Act2ChoiceManager : MonoBehaviour
 
         Debug.Log("[Act2Choice] 🎮 Loading Act 3 via Loading Scene...");
 
-        // Stop music
         if (audioSource != null)
         {
             audioSource.Stop();
@@ -482,7 +476,6 @@ public class Act2ChoiceManager : MonoBehaviour
 
         Debug.Log("[Act2Choice] Loading Main Menu...");
 
-        // Stop music
         if (audioSource != null)
         {
             audioSource.Stop();
@@ -504,50 +497,42 @@ public class Act2ChoiceManager : MonoBehaviour
         return choiceShown;
     }
 
-    // PUBLIC FUNCTION - Untuk dipanggil manual jika perlu
     public void ManualLoadAct3()
     {
         Debug.Log("[Act2Choice] Manual Act 3 load triggered!");
         PrepareAct3Transition();
     }
 
-    // 📱 PHONE EVIDENCE FUNCTIONS
-void ShowPhoneEvidence()
-{
-    if (phoneEvidencePrefab == null)
+    void ShowPhoneEvidence()
     {
-        Debug.LogWarning("[Act2Choice] Phone Evidence Prefab not assigned!");
-        return;
+        if (phoneEvidencePrefab == null)
+        {
+            Debug.LogWarning("[Act2Choice] Phone Evidence Prefab not assigned!");
+            return;
+        }
+
+        if (cameraTransform == null)
+        {
+            Debug.LogError("[Act2Choice] Camera Transform not found!");
+            return;
+        }
+
+        Vector3 spawnPosition = cameraTransform.position + cameraTransform.TransformDirection(phoneOffset);
+        Quaternion spawnRotation = cameraTransform.rotation * Quaternion.Euler(phoneRotation);
+
+        currentPhoneEvidence = Instantiate(phoneEvidencePrefab, spawnPosition, spawnRotation);
+        currentPhoneEvidence.transform.SetParent(cameraTransform);
+
+        Debug.Log("[Act2Choice] 📱 Phone evidence displayed!");
     }
 
-    if (cameraTransform == null)
+    void HidePhoneEvidence()
     {
-        Debug.LogError("[Act2Choice] Camera Transform not found!");
-        return;
+        if (currentPhoneEvidence != null)
+        {
+            Destroy(currentPhoneEvidence);
+            currentPhoneEvidence = null;
+            Debug.Log("[Act2Choice] 📱 Phone evidence hidden!");
+        }
     }
-
-    // Spawn phone di depan kamera
-    Vector3 spawnPosition = cameraTransform.position + cameraTransform.TransformDirection(phoneOffset);
-    Quaternion spawnRotation = cameraTransform.rotation * Quaternion.Euler(phoneRotation);
-
-    currentPhoneEvidence = Instantiate(phoneEvidencePrefab, spawnPosition, spawnRotation);
-    
-    // Parent ke camera agar ikut rotasi kamera
-    currentPhoneEvidence.transform.SetParent(cameraTransform);
-
-    Debug.Log("[Act2Choice] 📱 Phone evidence displayed!");
-
-    // Auto-hide setelah duration (optional - bisa dihapus jika mau manual click)
-    // Invoke("HidePhoneEvidence", phoneDisplayDuration);
-}
-
-void HidePhoneEvidence()
-{
-    if (currentPhoneEvidence != null)
-    {
-        Destroy(currentPhoneEvidence);
-        currentPhoneEvidence = null;
-        Debug.Log("[Act2Choice] 📱 Phone evidence hidden!");
-    }
-}
 }

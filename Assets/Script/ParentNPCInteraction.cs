@@ -15,6 +15,10 @@ public class ParentNPCInteraction : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public float textSpeed = 0.05f;
 
+    [Header("Audio Settings")] // ← BARU - Section untuk audio
+    public AudioClip clickSound; // ← BARU - Sound untuk click dialogue
+    private AudioSource audioSource; // ← BARU - AudioSource component
+
     [System.Serializable]
     public class DialogueLine
     {
@@ -34,7 +38,7 @@ public class ParentNPCInteraction : MonoBehaviour
     };
 
     [Header("Good Ending Settings")]
-    public Act2ChoiceManager choiceManager; // Reference untuk trigger good ending
+    public Act2ChoiceManager choiceManager;
 
     private bool canInteract = false;
     private bool isInteracting = false;
@@ -61,7 +65,14 @@ public class ParentNPCInteraction : MonoBehaviour
             choiceManager = FindObjectOfType<Act2ChoiceManager>();
         }
 
-        // PASTIKAN ADA EVENTSYSTEM (untuk detect click)
+        // ← BARU - Setup AudioSource
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+
         if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
         {
             GameObject eventSystem = new GameObject("EventSystem");
@@ -75,21 +86,17 @@ public class ParentNPCInteraction : MonoBehaviour
 
     void Update()
     {
-        // Handle dialogue progression dengan LEFT CLICK
         if (isInteracting)
         {
-            // DEBUG LOG
             if (Input.GetMouseButtonDown(0))
             {
+                PlayClickSound(); // ← BARU - Play sound setiap click!
+
                 Debug.Log("[ParentNPC] 🖱️ LEFT CLICK detected!");
                 Debug.Log($"[ParentNPC] isTyping: {isTyping}, currentLine: {currentLine}/{finalDialogues.Length}");
-            }
 
-            if (Input.GetMouseButtonDown(0))
-            {
                 if (isTyping)
                 {
-                    // Skip typing animation
                     StopAllCoroutines();
                     dialogueText.text = finalDialogues[currentLine].text;
                     isTyping = false;
@@ -101,26 +108,22 @@ public class ParentNPCInteraction : MonoBehaviour
                 }
             }
 
-            // Skip rest of Update - jangan check interaction lagi
             return;
         }
 
         if (!canInteract) return;
 
-        // Check distance to player
         if (player != null)
         {
             float distance = Vector3.Distance(transform.position, player.transform.position);
 
             if (distance <= interactionRange)
             {
-                // Show prompt
                 if (interactionPrompt != null)
                 {
                     interactionPrompt.SetActive(true);
                 }
 
-                // Check interact key
                 if (Input.GetKeyDown(interactKey))
                 {
                     StartFinalDialogue();
@@ -128,12 +131,20 @@ public class ParentNPCInteraction : MonoBehaviour
             }
             else
             {
-                // Hide prompt
                 if (interactionPrompt != null)
                 {
                     interactionPrompt.SetActive(false);
                 }
             }
+        }
+    }
+
+    // ← BARU - Function untuk play click sound
+    void PlayClickSound()
+    {
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.PlayOneShot(clickSound);
         }
     }
 
@@ -150,20 +161,17 @@ public class ParentNPCInteraction : MonoBehaviour
 
         Debug.Log("[ParentNPC] Starting final dialogue...");
 
-        // Hide prompt
         if (interactionPrompt != null)
         {
             interactionPrompt.SetActive(false);
         }
 
-        // Hide Quest UI juga (kalau masih muncul)
         TrashCleanupManager cleanupManager = FindObjectOfType<TrashCleanupManager>();
         if (cleanupManager != null && cleanupManager.questUI != null)
         {
             cleanupManager.questUI.SetActive(false);
         }
 
-        // Show dialogue box
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(true);
@@ -174,12 +182,10 @@ public class ParentNPCInteraction : MonoBehaviour
             Debug.LogError("[ParentNPC] ❌ DialogueBox is NULL!");
         }
 
-        // UNLOCK CURSOR & MAKE VISIBLE - PENTING!
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         Debug.Log("[ParentNPC] ✅ Cursor unlocked & visible!");
 
-        // DISABLE PLAYER MOVEMENT
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -191,7 +197,6 @@ public class ParentNPCInteraction : MonoBehaviour
             }
         }
 
-        // Start typing
         StartCoroutine(TypeLine());
     }
 
@@ -233,24 +238,21 @@ public class ParentNPCInteraction : MonoBehaviour
     void EndFinalDialogue()
     {
         isInteracting = false;
-        canInteract = false; // ← DISABLE INTERACTION PERMANENTLY
+        canInteract = false;
 
         Debug.Log("[ParentNPC] ✅ Final dialogue selesai! Menuju Good Ending...");
 
-        // Hide dialogue box
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
         }
 
-        // ← HIDE INTERACTION PROMPT PERMANENTLY!
         if (interactionPrompt != null)
         {
             interactionPrompt.SetActive(false);
             Debug.Log("[ParentNPC] Interaction prompt HIDDEN!");
         }
 
-        // RE-ENABLE PLAYER MOVEMENT (kalau perlu)
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -262,7 +264,6 @@ public class ParentNPCInteraction : MonoBehaviour
             }
         }
 
-        // Trigger Good Ending via Act2ChoiceManager
         if (choiceManager != null)
         {
             choiceManager.ShowGoodEndingAfterCleanup();
@@ -272,11 +273,10 @@ public class ParentNPCInteraction : MonoBehaviour
             Debug.LogError("[ParentNPC] ❌ Act2ChoiceManager not found!");
         }
     }
+
     void OnDrawGizmosSelected()
     {
-        // Visualisasi interaction range
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
     }
-
 }

@@ -4096,6 +4096,12 @@ PrefabInstance:
       addedObject: {fileID: 156414705}
   m_SourcePrefab: {fileID: -3199799093341109342, guid: 14c6a64f094a2bc4091fa1188d809601,
     type: 3}
+--- !u!1 &369391717 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2107409826236812522, guid: 4fa831f0856096544aa85efb35e78481,
+    type: 3}
+  m_PrefabInstance: {fileID: 482964957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &372821199
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4620,6 +4626,12 @@ MonoBehaviour:
     text: Jannah... kenapa kamu...
   - speaker: PAPA
     text: Sudah Ma... Biarkan dia sendiri dulu. Ayo kita keluar.
+  phoneEvidencePrefab: {fileID: 369391717}
+  cameraTransform: {fileID: 330585546}
+  phoneOffset: {x: 0, y: 0.1, z: 0.35}
+  phoneRotation: {x: 0, y: 0, z: 0}
+  phoneDisplayDuration: 3
+  showPhoneAtLineIndex: 1
   goodEndingPanel: {fileID: 1001833524}
   goodEndingMusic: {fileID: 8300000, guid: ddc52e61414831f4484a0600ef216fdd, type: 3}
   loadMainMenuAfterEnding: 1
@@ -5278,7 +5290,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      insertIndex: 9
+      addedObject: {fileID: 743239947}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 3150474306388093854, guid: 4fa831f0856096544aa85efb35e78481,
     type: 3}
@@ -7453,7 +7469,7 @@ GameObject:
   - component: {fileID: 743239945}
   - component: {fileID: 743239944}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: GAMBAR TAGIHAN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7538,12 +7554,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 743239943}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 75.487404, y: 11.597, z: 22.61}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0066947937, y: 0.081, z: -0.073223114}
+  m_LocalScale: {x: 0.0001, y: 1.28, z: 0.6999998}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 482964958}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &753292883
 PrefabInstance:
@@ -10431,6 +10447,7 @@ MonoBehaviour:
   dialogueNameText: {fileID: 1914022650}
   dialogueText: {fileID: 1830213358}
   textSpeed: 0.05
+  clickSound: {fileID: 8300000, guid: 12e3629ba25b2c140b3d694b2768d463, type: 3}
   finalDialogues:
   - speaker: PAPA
     text: Wah, kamarmu sudah rapi sekali Jannah!
@@ -18052,4 +18069,3 @@ SceneRoots:
   - {fileID: 1529094432}
   - {fileID: 423845692}
   - {fileID: 853547910}
-  - {fileID: 743239947}
