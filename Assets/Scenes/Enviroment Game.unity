@@ -292,7 +292,7 @@ MonoBehaviour:
   dayText: {fileID: 0}
   act1OnlyUI: []
   act2OnlyUI: []
-  resetOnStart: 1
+  resetOnStart: 0
 --- !u!4 &12967774
 Transform:
   m_ObjectHideFlags: 0
@@ -658,6 +658,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Crushed Soda Can (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1231,6 +1236,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Crushed Soda Can (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4021,6 +4031,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Debris Papers (1)
       objectReference: {fileID: 0}
+    - target: {fileID: -293203802875518696, guid: 14c6a64f094a2bc4091fa1188d809601,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
+      objectReference: {fileID: 0}
     - target: {fileID: 7881466077556996133, guid: 14c6a64f094a2bc4091fa1188d809601,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4514,6 +4529,124 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 411935594}
   m_CullTransparentMesh: 1
+--- !u!1 &423845690
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 423845692}
+  - component: {fileID: 423845691}
+  m_Layer: 0
+  m_Name: Act2ChoiceManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &423845691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 423845690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f2065324f2660c4d902d9836fa3d58a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  choicePanel: {fileID: 1849865954}
+  choice1Button: {fileID: 216010265}
+  choice2Button: {fileID: 1611344617}
+  choice1Text: {fileID: 71088295}
+  choice2Text: {fileID: 1582344587}
+  choice1Label: Mengaku
+  choice2Label: Pura-pura tidak tahu
+  clickSound: {fileID: 8300000, guid: 12e3629ba25b2c140b3d694b2768d463, type: 3}
+  dialogueBox: {fileID: 1804208908}
+  dialogueNameText: {fileID: 1914022650}
+  dialogueText: {fileID: 1830213358}
+  textSpeed: 0.05
+  honestDialogues:
+  - speaker: JANNAH
+    text: Ma... Pa... Maafin aku...
+  - speaker: PAPA
+    text: Jannah? Ada apa?
+  - speaker: JANNAH
+    text: Aku... aku yang foto kartu kredit kalian. Aku pakai buat beli skin game.
+  - speaker: MAMA
+    text: Jannah... kenapa kamu lakukan itu? Kenapa tidak bilang ke Mama kalau butuh
+      sesuatu?
+  - speaker: JANNAH
+    text: Aku takut... aku tahu ini salah. Aku malu sama diri sendiri.
+  - speaker: PAPA
+    text: Setidaknya kamu jujur sekarang. Papa senang kamu berani mengakuinya.
+  - speaker: JANNAH
+    text: Aku janji akan berubah. Mulai dari sekarang, aku akan jadi anak yang lebih
+      baik.
+  - speaker: JANNAH
+    text: Aku akan rajin belajar, beresin kamar, dan nggak akan bohong lagi.
+  - speaker: MAMA
+    text: Mama bangga sama kamu, Jannah. Mengakui kesalahan itu butuh keberanian.
+  - speaker: PAPA
+    text: Ayo kita mulai dari awal lagi. Papa dan Mama maafin kamu tapi kamu harus
+      beresin kamar kamu sekarang ya.
+  - speaker: JANNAH
+    text: Baik pa.
+  lieDialogues:
+  - speaker: JANNAH
+    text: Aku nggak tau apa-apa! Kenapa kalian tuduh aku?
+  - speaker: PAPA
+    text: Jannah, kita sudah dapat buktinya. Ini tagihan dari kartu kredit Papa.
+  - speaker: PAPA
+    text: Semuanya transaksi game. Dan itu terjadi pas kamu di rumah sendirian.
+  - speaker: JANNAH
+    text: Itu bukan aku! Mungkin orang lain yang pake!
+  - speaker: MAMA
+    text: Jannah, tolong jujur sama Mama. Kita bisa selesaikan ini baik-baik kalau
+      kamu jujur.
+  - speaker: JANNAH
+    text: MAMA NGGAK PERCAYA AKU?! KALIAN BERDUA SELALU NUDUH AKU!
+  - speaker: PAPA
+    text: Jannah! Jangan bicara seperti itu sama Mama kamu!
+  - speaker: JANNAH
+    text: DIAM! KELUAR DARI KAMARKU! AKU BENCI KALIAN!
+  - speaker: JANNAH
+    text: PERGI! JANGAN GANGGU AKU LAGI!
+  - speaker: MAMA
+    text: Jannah... kenapa kamu...
+  - speaker: PAPA
+    text: Sudah Ma... Biarkan dia sendiri dulu. Ayo kita keluar.
+  goodEndingPanel: {fileID: 1001833524}
+  goodEndingMusic: {fileID: 8300000, guid: ddc52e61414831f4484a0600ef216fdd, type: 3}
+  loadMainMenuAfterEnding: 1
+  endingDisplayTime: 8
+  mainMenuSceneName: Main Menu
+  loadAct3AfterLieDialogue: 1
+  delayBeforeAct3: 2
+  loadingSceneName: LoadingScene
+  act3Number: 3
+  act3Day: 100
+  pauseAtLineIndex: 9
+  cleanupManager: {fileID: 0}
+--- !u!4 &423845692
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 423845690}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 781.28705, y: 482.42615, z: -303.83804}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &425349968
 GameObject:
   m_ObjectHideFlags: 0
@@ -5065,6 +5198,96 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 908051115}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &482964957
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 485476781}
+    m_Modifications:
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 21.65
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.7853642
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -14.213776
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2107409826236812522, guid: 4fa831f0856096544aa85efb35e78481,
+        type: 3}
+      propertyPath: m_Name
+      value: Phone (Tampilan CC)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 3150474306388093854, guid: 4fa831f0856096544aa85efb35e78481,
+    type: 3}
+--- !u!4 &482964958 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3970243614316841892, guid: 4fa831f0856096544aa85efb35e78481,
+    type: 3}
+  m_PrefabInstance: {fileID: 482964957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &485476780
 GameObject:
   m_ObjectHideFlags: 0
@@ -5102,6 +5325,7 @@ Transform:
   - {fileID: 1159626807}
   - {fileID: 802913994}
   - {fileID: 471972476}
+  - {fileID: 482964958}
   - {fileID: 1083343581}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7216,6 +7440,111 @@ PrefabInstance:
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 3150474306388093854, guid: 95cdbfb691dadee43abb9ba89f236195,
     type: 3}
+--- !u!1 &743239943
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 743239947}
+  - component: {fileID: 743239946}
+  - component: {fileID: 743239945}
+  - component: {fileID: 743239944}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &743239944
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743239943}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &743239945
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743239943}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: e25d33fea8f4c3b41b1252856abf7855, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &743239946
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743239943}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &743239947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743239943}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 75.487404, y: 11.597, z: 22.61}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &753292883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7428,6 +7757,64 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &853547908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 853547910}
+  - component: {fileID: 853547909}
+  m_Layer: 0
+  m_Name: TrashCleanupManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &853547909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 853547908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e59024e1cf0cb4b9b9376ceeb5b71d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trashObjects:
+  - {fileID: 1474682698}
+  - {fileID: 1361380790}
+  - {fileID: 1989375409}
+  - {fileID: 156414703}
+  - {fileID: 1089038570}
+  - {fileID: 907179159}
+  questUI: {fileID: 411935594}
+  questTitle: {fileID: 964430126}
+  questDescription: {fileID: 446991464}
+  interactKey: 101
+  interactionRange: 1.5
+  interactionPrompt: {fileID: 684055792}
+  parentNPC: {fileID: 1208887909}
+--- !u!4 &853547910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 853547908}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 67.39797, y: 6.203796, z: 59.419765}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8703,7 +9090,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1001833525
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9932,6 +10319,7 @@ GameObject:
   - component: {fileID: 1208887905}
   - component: {fileID: 1208887907}
   - component: {fileID: 1208887908}
+  - component: {fileID: 1208887909}
   m_Layer: 0
   m_Name: Bapak
   m_TagString: NPC
@@ -10024,6 +10412,37 @@ MonoBehaviour:
   startLookingLeft: 0
   animator: {fileID: 2071655531}
   angleThreshold: 5
+--- !u!114 &1208887909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208887903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e708b49090ab9644b1b7f8d6004f678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactKey: 101
+  interactionRange: 3
+  interactionPrompt: {fileID: 684055792}
+  dialogueBox: {fileID: 1804208908}
+  dialogueNameText: {fileID: 1914022650}
+  dialogueText: {fileID: 1830213358}
+  textSpeed: 0.05
+  finalDialogues:
+  - speaker: PAPA
+    text: Wah, kamarmu sudah rapi sekali Jannah!
+  - speaker: MAMA
+    text: Papa dan Mama bangga sama kamu.
+  - speaker: JANNAH
+    text: Terima kasih Pa, Ma. Aku janji akan lebih bertanggung jawab.
+  - speaker: PAPA
+    text: Itu yang Papa mau dengar. Ayo kita mulai dari awal lagi.
+  - speaker: MAMA
+    text: Kami sayang kamu, Jannah.
+  choiceManager: {fileID: 423845691}
 --- !u!1 &1219994663
 GameObject:
   m_ObjectHideFlags: 0
@@ -10894,6 +11313,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Crushed Soda Can (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10912,6 +11336,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Debris Papers
+      objectReference: {fileID: 0}
+    - target: {fileID: -293203802875518696, guid: 14c6a64f094a2bc4091fa1188d809601,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
       objectReference: {fileID: 0}
     - target: {fileID: 7881466077556996133, guid: 14c6a64f094a2bc4091fa1188d809601,
         type: 3}
@@ -11687,13 +12116,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Crushed Soda Can
       objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1746281390834333844, guid: 75680aa2bd41d54409d7985b66087131,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 49755236}
     - targetCorrespondingSourceObject: {fileID: 1746281390834333844, guid: 75680aa2bd41d54409d7985b66087131,
         type: 3}
       insertIndex: -1
@@ -11702,6 +12132,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 544593542}
+    - targetCorrespondingSourceObject: {fileID: 1746281390834333844, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 49755236}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
         type: 3}
@@ -11790,6 +12224,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Trash Bags (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: -293203802875518696, guid: 2300617a4346e154d8f7098e8ebaac0a,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
       objectReference: {fileID: 0}
     - target: {fileID: 7881466077556996133, guid: 2300617a4346e154d8f7098e8ebaac0a,
         type: 3}
@@ -12933,6 +13372,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Crushed Soda Can (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15246,6 +15690,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Crushed Soda Can (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -15645,7 +16094,6 @@ GameObject:
   - component: {fileID: 1849865955}
   - component: {fileID: 1849865958}
   - component: {fileID: 1849865957}
-  - component: {fileID: 1849865956}
   m_Layer: 5
   m_Name: ChoicePanelAct2
   m_TagString: Untagged
@@ -15675,74 +16123,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1331.25, y: 778}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1849865956
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1849865954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f2065324f2660c4d902d9836fa3d58a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  choicePanel: {fileID: 1849865954}
-  choice1Button: {fileID: 216010265}
-  choice2Button: {fileID: 1611344617}
-  choice1Text: {fileID: 71088295}
-  choice2Text: {fileID: 1582344587}
-  choice1Label: Mengaku
-  choice2Label: Pura-pura tidak tahu
-  clickSound: {fileID: 0}
-  dialogueBox: {fileID: 0}
-  dialogueNameText: {fileID: 0}
-  dialogueText: {fileID: 0}
-  textSpeed: 0.05
-  honestDialogues:
-  - speaker: JANNAH
-    text: 
-  - speaker: JANNAH
-    text: 
-  - speaker: JANNAH
-    text: 
-  - speaker: JANNAH
-    text: 
-  lieDialogues:
-  - speaker: PAPA
-    text: Jannah, kita sudah dapat bukti tagihan dari HP kita. Ini kartu kredit kita
-      yang kamu pakai!
-  - speaker: JANNAH
-    text: Itu bukan aku! Aku nggak tahu apa-apa!
-  - speaker: MAMA
-    text: Jannah, jangan berbohong! Kita sudah lihat history transaksinya. Ini untuk
-      game, kan?
-  - speaker: JANNAH
-    text: KALIAN NGGAK PERCAYA AKU! KELUAR DARI KAMARKU!
-  - speaker: JANNAH
-    text: AKU BENCI KALIAN! PERGI!
-  goodEndingPanel: {fileID: 0}
-  goodEndingImage: {fileID: 0}
-  happyFamilySprite: {fileID: 0}
-  goodEndingText: {fileID: 0}
-  goodEndingMessage: 'GOOD ENDING
-
-
-    Jannah mengakui kesalahannya.
-
-    Ia berjanji
-    akan menjadi anak yang lebih baik.
-
-    Keluarga kembali harmonis.'
-  goodEndingMusic: {fileID: 0}
-  loadMainMenuAfterEnding: 1
-  endingDisplayTime: 5
-  mainMenuSceneName: Main Menu
-  loadAct3AfterLieDialogue: 1
-  delayBeforeAct3: 2
-  loadingSceneName: LoadingScene
-  act3Number: 3
-  act3Day: 60
 --- !u!114 &1849865957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16754,6 +17134,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Crushed Soda Can (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17280,6 +17665,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Trash Bags
       objectReference: {fileID: 0}
+    - target: {fileID: -293203802875518696, guid: 2300617a4346e154d8f7098e8ebaac0a,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
+      objectReference: {fileID: 0}
     - target: {fileID: 7881466077556996133, guid: 2300617a4346e154d8f7098e8ebaac0a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -17402,6 +17792,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Crushed Soda Can (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7042261733086434576, guid: 75680aa2bd41d54409d7985b66087131,
+        type: 3}
+      propertyPath: m_TagString
+      value: Trash
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17655,3 +18050,6 @@ SceneRoots:
   - {fileID: 1459334581}
   - {fileID: 521545918}
   - {fileID: 1529094432}
+  - {fileID: 423845692}
+  - {fileID: 853547910}
+  - {fileID: 743239947}

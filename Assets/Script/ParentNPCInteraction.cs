@@ -233,6 +233,7 @@ public class ParentNPCInteraction : MonoBehaviour
     void EndFinalDialogue()
     {
         isInteracting = false;
+        canInteract = false; // ← DISABLE INTERACTION PERMANENTLY
 
         Debug.Log("[ParentNPC] ✅ Final dialogue selesai! Menuju Good Ending...");
 
@@ -240,6 +241,13 @@ public class ParentNPCInteraction : MonoBehaviour
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
+        }
+
+        // ← HIDE INTERACTION PROMPT PERMANENTLY!
+        if (interactionPrompt != null)
+        {
+            interactionPrompt.SetActive(false);
+            Debug.Log("[ParentNPC] Interaction prompt HIDDEN!");
         }
 
         // RE-ENABLE PLAYER MOVEMENT (kalau perlu)
@@ -264,11 +272,11 @@ public class ParentNPCInteraction : MonoBehaviour
             Debug.LogError("[ParentNPC] ❌ Act2ChoiceManager not found!");
         }
     }
-
     void OnDrawGizmosSelected()
     {
         // Visualisasi interaction range
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
     }
+
 }

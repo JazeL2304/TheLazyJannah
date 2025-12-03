@@ -65,6 +65,15 @@ public class Act2ChoiceManager : MonoBehaviour
         new DialogueLine { speaker = "PAPA", text = "Sudah Ma... Biarkan dia sendiri dulu. Ayo kita keluar." }
     };
 
+    [Header("📱 PHONE EVIDENCE (ROUTE 2)")]
+    public GameObject phoneEvidencePrefab; // Prefab HP yang muncul
+    public Transform cameraTransform; // Camera untuk posisi HP
+    public Vector3 phoneOffset = new Vector3(0f, -0.2f, 0.5f); // Offset dari kamera
+    public Vector3 phoneRotation = new Vector3(0f, 180f, 0f); // Rotasi HP
+    public float phoneDisplayDuration = 3f; // Berapa lama HP muncul (detik)
+    public int showPhoneAtLineIndex = 1; // Line "Jannah, kita sudah dapat buktinya..."
+    private GameObject currentPhoneEvidence;
+
     [Header("🎬 GOOD ENDING PANEL (ROUTE 1 ONLY)")]
     public GameObject goodEndingPanel;
 
