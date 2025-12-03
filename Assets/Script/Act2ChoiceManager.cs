@@ -46,7 +46,7 @@ public class Act2ChoiceManager : MonoBehaviour
         new DialogueLine { speaker = "JANNAH", text = "Aku janji akan berubah. Mulai dari sekarang, aku akan jadi anak yang lebih baik." },
         new DialogueLine { speaker = "JANNAH", text = "Aku akan rajin belajar, beresin kamar, dan nggak akan bohong lagi." },
         new DialogueLine { speaker = "MAMA", text = "Mama bangga sama kamu, Jannah. Mengakui kesalahan itu butuh keberanian." },
-        new DialogueLine { speaker = "PAPA", text = "Ayo kita mulai dari awal lagi. Papa dan Mama akan bantu kamu." }
+        new DialogueLine { speaker = "PAPA", text = "Baik Pa. Mulai sekarang, beresin kamarmu dulu ya." }
     };
 
     [Header("📝 ROUTE 2: BOHONG → LANJUT ACT 3")]
@@ -66,7 +66,7 @@ public class Act2ChoiceManager : MonoBehaviour
     };
 
     [Header("🎬 GOOD ENDING PANEL (ROUTE 1 ONLY)")]
-    public GameObject goodEndingPanel;  // Panel sudah lengkap dengan Image & Text di dalamnya
+    public GameObject goodEndingPanel;
 
     [Header("🎵 GOOD ENDING MUSIC (Optional)")]
     public AudioClip goodEndingMusic;
@@ -81,13 +81,18 @@ public class Act2ChoiceManager : MonoBehaviour
     public float delayBeforeAct3 = 2f;
     public string loadingSceneName = "LoadingScene";
     public int act3Number = 3;
-    public int act3Day = 60; // Misal 30 hari setelah Act 2
+    public int act3Day = 60;
+
+    [Header("🧹 CLEANUP QUEST (ROUTE 1)")]
+    public int pauseAtLineIndex = 9; // Line "Baik Pa" (index 9)
+    public TrashCleanupManager cleanupManager;
 
     private bool choiceShown = false;
     private int currentDialogueLine = 0;
     private bool isTyping = false;
     private bool dialogueActive = false;
     private bool isHonestRoute = false;
+    private bool isPausedForCleanup = false;
 
     void Start()
     {
@@ -121,11 +126,33 @@ public class Act2ChoiceManager : MonoBehaviour
             goodEndingPanel.SetActive(false);
         }
 
+        // AUTO-DETECT CLEANUP MANAGER
+        if (cleanupManager == null)
+        {
+            cleanupManager = FindObjectOfType<TrashCleanupManager>();
+            if (cleanupManager != null)
+            {
+                Debug.Log("[Act2Choice] TrashCleanupManager auto-detected!");
+            }
+        }
+
         Debug.Log("[Act2Choice] Script initialized!");
     }
 
     void Update()
     {
+        // CHECK IF PAUSED FOR CLEANUP
+        if (isPausedForCleanup)
+        {
+            // Wait until cleanup quest is complete
+            if (cleanupManager != null && cleanupManager.IsQuestComplete())
+            {
+                // Do nothing, waiting for player to interact with parents
+                // ParentNPCInteraction will call ShowGoodEndingAfterCleanup()
+            }
+            return;
+        }
+
         if (dialogueActive && Input.GetMouseButtonDown(0))
         {
             PlayClickSound();
@@ -182,7 +209,6 @@ public class Act2ChoiceManager : MonoBehaviour
 
         isHonestRoute = true;
 
-        // Delay sedikit sebelum start dialogue (untuk ensure panel sudah hide)
         Invoke("StartDialogueSequence", 0.2f);
     }
 
@@ -195,7 +221,6 @@ public class Act2ChoiceManager : MonoBehaviour
 
         isHonestRoute = false;
 
-        // Delay sedikit sebelum start dialogue (untuk ensure panel sudah hide)
         Invoke("StartDialogueSequence", 0.2f);
     }
 
@@ -207,6 +232,7 @@ public class Act2ChoiceManager : MonoBehaviour
 
         currentDialogueLine = 0;
         dialogueActive = true;
+        isPausedForCleanup = false; // Reset pause flag
 
         if (dialogueBox != null)
         {
@@ -225,7 +251,6 @@ public class Act2ChoiceManager : MonoBehaviour
 
         Debug.Log($"[Act2Choice] Starting {(isHonestRoute ? "HONEST" : "LIE")} dialogue sequence...");
 
-        // START COROUTINE DENGAN SAFETY CHECK
         if (gameObject.activeInHierarchy)
         {
             StartCoroutine(TypeDialogueLine());
@@ -261,6 +286,37 @@ public class Act2ChoiceManager : MonoBehaviour
 
     void NextDialogueLine()
     {
+        // CHECK FOR CLEANUP PAUSE (ROUTE 1 ONLY)
+        if (isHonestRoute && currentDialogueLine == pauseAtLineIndex)
+        {
+            Debug.Log("[Act2Choice] 🛑 PAUSE untuk beresin kamar!");
+
+            isPausedForCleanup = true;
+            dialogueActive = false;
+
+            // Hide dialogue box
+            if (dialogueBox != null)
+            {
+                dialogueBox.SetActive(false);
+            }
+
+            // Unlock cursor untuk gameplay
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            // Start cleanup quest
+            if (cleanupManager != null)
+            {
+                cleanupManager.StartCleanupQuest();
+            }
+            else
+            {
+                Debug.LogError("[Act2Choice] ❌ TrashCleanupManager not assigned!");
+            }
+
+            return;
+        }
+
         currentDialogueLine++;
 
         DialogueLine[] currentDialogues = isHonestRoute ? honestDialogues : lieDialogues;
@@ -288,7 +344,9 @@ public class Act2ChoiceManager : MonoBehaviour
 
         if (isHonestRoute)
         {
-            // ROUTE 1: GOOD ENDING
+            // ROUTE 1: Seharusnya tidak sampai sini karena ada pause
+            // Tapi jika sampai sini (tidak ada cleanup quest), langsung good ending
+            Debug.LogWarning("[Act2Choice] Honest route finished without cleanup quest!");
             ShowGoodEnding();
         }
         else
@@ -325,6 +383,21 @@ public class Act2ChoiceManager : MonoBehaviour
         {
             Debug.LogError("[Act2Choice] ❌ Good Ending Panel not assigned!");
         }
+    }
+
+    // 🆕 FUNCTION BARU - Dipanggil dari ParentNPCInteraction setelah cleanup quest
+    public void ShowGoodEndingAfterCleanup()
+    {
+        Debug.Log("[Act2Choice] 🎉 Cleanup quest selesai! Showing Good Ending...");
+
+        // Hide any remaining UI
+        if (dialogueBox != null)
+        {
+            dialogueBox.SetActive(false);
+        }
+
+        // Show good ending
+        ShowGoodEnding();
     }
 
     void PrepareAct3Transition()
