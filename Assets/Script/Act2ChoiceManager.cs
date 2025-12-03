@@ -65,6 +65,9 @@ public class Act2ChoiceManager : MonoBehaviour
         new DialogueLine { speaker = "PAPA", text = "Sudah Ma... Biarkan dia sendiri dulu. Ayo kita keluar." }
     };
 
+    // Di bagian Header "📱 PHONE EVIDENCE (ROUTE 2)" (sekitar line 40-50)
+    // Tambahkan variable baru:
+
     [Header("📱 PHONE EVIDENCE (ROUTE 2)")]
     public GameObject phoneEvidencePrefab; // Prefab HP yang muncul
     public Transform cameraTransform; // Camera untuk posisi HP
@@ -142,6 +145,16 @@ public class Act2ChoiceManager : MonoBehaviour
             if (cleanupManager != null)
             {
                 Debug.Log("[Act2Choice] TrashCleanupManager auto-detected!");
+            }
+        }
+
+        // AUTO-DETECT CAMERA (tambahkan sebelum Debug.Log terakhir)
+        if (cameraTransform == null)
+        {
+            cameraTransform = Camera.main.transform;
+            if (cameraTransform != null)
+            {
+                Debug.Log("[Act2Choice] Camera auto-detected!");
             }
         }
 
@@ -284,6 +297,12 @@ public class Act2ChoiceManager : MonoBehaviour
             dialogueNameText.text = currentLine.speaker;
         }
 
+        // ✅ SHOW PHONE EVIDENCE SAAT LINE BUKTI (ROUTE 2 ONLY)
+        if (!isHonestRoute && currentDialogueLine == showPhoneAtLineIndex)
+        {
+            ShowPhoneEvidence();
+        }
+
         foreach (char c in currentLine.text.ToCharArray())
         {
             dialogueText.text += c;
@@ -295,6 +314,12 @@ public class Act2ChoiceManager : MonoBehaviour
 
     void NextDialogueLine()
     {
+        // ✅ HIDE PHONE EVIDENCE SAAT NEXT LINE
+        if (currentPhoneEvidence != null)
+        {
+            HidePhoneEvidence();
+        }
+
         // CHECK FOR CLEANUP PAUSE (ROUTE 1 ONLY)
         if (isHonestRoute && currentDialogueLine == pauseAtLineIndex)
         {
@@ -485,4 +510,44 @@ public class Act2ChoiceManager : MonoBehaviour
         Debug.Log("[Act2Choice] Manual Act 3 load triggered!");
         PrepareAct3Transition();
     }
+
+    // 📱 PHONE EVIDENCE FUNCTIONS
+void ShowPhoneEvidence()
+{
+    if (phoneEvidencePrefab == null)
+    {
+        Debug.LogWarning("[Act2Choice] Phone Evidence Prefab not assigned!");
+        return;
+    }
+
+    if (cameraTransform == null)
+    {
+        Debug.LogError("[Act2Choice] Camera Transform not found!");
+        return;
+    }
+
+    // Spawn phone di depan kamera
+    Vector3 spawnPosition = cameraTransform.position + cameraTransform.TransformDirection(phoneOffset);
+    Quaternion spawnRotation = cameraTransform.rotation * Quaternion.Euler(phoneRotation);
+
+    currentPhoneEvidence = Instantiate(phoneEvidencePrefab, spawnPosition, spawnRotation);
+    
+    // Parent ke camera agar ikut rotasi kamera
+    currentPhoneEvidence.transform.SetParent(cameraTransform);
+
+    Debug.Log("[Act2Choice] 📱 Phone evidence displayed!");
+
+    // Auto-hide setelah duration (optional - bisa dihapus jika mau manual click)
+    // Invoke("HidePhoneEvidence", phoneDisplayDuration);
+}
+
+void HidePhoneEvidence()
+{
+    if (currentPhoneEvidence != null)
+    {
+        Destroy(currentPhoneEvidence);
+        currentPhoneEvidence = null;
+        Debug.Log("[Act2Choice] 📱 Phone evidence hidden!");
+    }
+}
 }
