@@ -26,26 +26,6 @@ public class Act2ChoiceManager : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public float textSpeed = 0.05f;
 
-    [Header("📝 DIALOGUE - CHOICE 1 (JUJUR)")]
-    [TextArea(3, 10)]
-    public string[] honestDialogues = new string[]
-    {
-        "Maaf, Mama... Papa... Aku yang ambil kartu kredit kalian.",
-        "Aku... aku butuh uang untuk beli skin game. Aku tahu ini salah.",
-        "Aku janji akan jadi anak yang lebih baik. Mulai dari membereskan kamar ini.",
-        "Aku akan lebih rajin belajar dan tidak akan mencuri lagi."
-    };
-
-    [Header("📝 DIALOGUE - CHOICE 2 (BOHONG)")]
-    public DialogueLine[] lieDialogues = new DialogueLine[]
-    {
-        new DialogueLine { speaker = "PAPA", text = "Jannah, kita sudah dapat bukti tagihan dari HP kita. Ini kartu kredit kita yang kamu pakai!" },
-        new DialogueLine { speaker = "JANNAH", text = "Itu bukan aku! Aku nggak tahu apa-apa!" },
-        new DialogueLine { speaker = "MAMA", text = "Jannah, jangan berbohong! Kita sudah lihat history transaksinya. Ini untuk game, kan?" },
-        new DialogueLine { speaker = "JANNAH", text = "KALIAN NGGAK PERCAYA AKU! KELUAR DARI KAMARKU!" },
-        new DialogueLine { speaker = "JANNAH", text = "AKU BENCI KALIAN! PERGI!" }
-    };
-
     [System.Serializable]
     public class DialogueLine
     {
@@ -54,20 +34,54 @@ public class Act2ChoiceManager : MonoBehaviour
         public string text;
     }
 
-    [Header("🎬 ENDING PANELS")]
-    public GameObject goodEndingPanel;  // Panel untuk Good Ending (pelukan bahagia)
-    public GameObject badEndingPanel;   // Panel untuk Bad Ending (hati retak)
+    [Header("📝 ROUTE 1: JUJUR → GOOD ENDING")]
+    public DialogueLine[] honestDialogues = new DialogueLine[]
+    {
+        new DialogueLine { speaker = "JANNAH", text = "Ma... Pa... Maafin aku..." },
+        new DialogueLine { speaker = "PAPA", text = "Jannah? Ada apa?" },
+        new DialogueLine { speaker = "JANNAH", text = "Aku... aku yang ambil kartu kredit kalian. Aku pakai buat beli skin game." },
+        new DialogueLine { speaker = "MAMA", text = "Jannah... kenapa kamu lakukan itu? Kenapa tidak bilang ke Mama kalau butuh sesuatu?" },
+        new DialogueLine { speaker = "JANNAH", text = "Aku takut... aku tahu ini salah. Aku malu sama diri sendiri." },
+        new DialogueLine { speaker = "PAPA", text = "Setidaknya kamu jujur sekarang. Papa senang kamu berani mengakuinya." },
+        new DialogueLine { speaker = "JANNAH", text = "Aku janji akan berubah. Mulai dari sekarang, aku akan jadi anak yang lebih baik." },
+        new DialogueLine { speaker = "JANNAH", text = "Aku akan rajin belajar, beresin kamar, dan nggak akan bohong lagi." },
+        new DialogueLine { speaker = "MAMA", text = "Mama bangga sama kamu, Jannah. Mengakui kesalahan itu butuh keberanian." },
+        new DialogueLine { speaker = "PAPA", text = "Ayo kita mulai dari awal lagi. Papa dan Mama akan bantu kamu." }
+    };
 
-    [Header("🖼️ ENDING IMAGES")]
-    public Image goodEndingImage;  // Image component untuk gambar pelukan
-    public Image badEndingImage;   // Image component untuk gambar hati retak
-    public Sprite happyFamilySprite;  // Sprite pelukan bahagia
-    public Sprite brokenHeartSprite;  // Sprite hati retak
+    [Header("📝 ROUTE 2: BOHONG → LANJUT ACT 3")]
+    public DialogueLine[] lieDialogues = new DialogueLine[]
+    {
+        new DialogueLine { speaker = "JANNAH", text = "Aku nggak tau apa-apa! Kenapa kalian tuduh aku?" },
+        new DialogueLine { speaker = "PAPA", text = "Jannah, kita sudah dapat buktinya. Ini tagihan dari kartu kredit Papa." },
+        new DialogueLine { speaker = "PAPA", text = "Semuanya transaksi game. Dan itu terjadi pas kamu di rumah sendirian." },
+        new DialogueLine { speaker = "JANNAH", text = "Itu bukan aku! Mungkin orang lain yang pake!" },
+        new DialogueLine { speaker = "MAMA", text = "Jannah, tolong jujur sama Mama. Kita bisa selesaikan ini baik-baik kalau kamu jujur." },
+        new DialogueLine { speaker = "JANNAH", text = "MAMA NGGAK PERCAYA AKU?! KALIAN BERDUA SELALU NUDUH AKU!" },
+        new DialogueLine { speaker = "PAPA", text = "Jannah! Jangan bicara seperti itu sama Mama kamu!" },
+        new DialogueLine { speaker = "JANNAH", text = "DIAM! KELUAR DARI KAMARKU! AKU BENCI KALIAN!" },
+        new DialogueLine { speaker = "JANNAH", text = "PERGI! JANGAN GANGGU AKU LAGI!" },
+        new DialogueLine { speaker = "MAMA", text = "Jannah... kenapa kamu..." },
+        new DialogueLine { speaker = "PAPA", text = "Sudah Ma... Biarkan dia sendiri dulu. Ayo kita keluar." }
+    };
 
-    [Header("🎮 SCENE MANAGEMENT")]
+    [Header("🎬 GOOD ENDING PANEL (ROUTE 1 ONLY)")]
+    public GameObject goodEndingPanel;  // Panel sudah lengkap dengan Image & Text di dalamnya
+
+    [Header("🎵 GOOD ENDING MUSIC (Optional)")]
+    public AudioClip goodEndingMusic;
+
+    [Header("🎮 ENDING SCENE MANAGEMENT")]
     public bool loadMainMenuAfterEnding = true;
-    public float endingDisplayTime = 5f;  // Durasi tampilan ending sebelum ke menu
+    public float endingDisplayTime = 8f;
     public string mainMenuSceneName = "Main Menu";
+
+    [Header("⏭️ ACT 3 PROGRESSION (ROUTE 2)")]
+    public bool loadAct3AfterLieDialogue = true;
+    public float delayBeforeAct3 = 2f;
+    public string loadingSceneName = "LoadingScene";
+    public int act3Number = 3;
+    public int act3Day = 60; // Misal 30 hari setelah Act 2
 
     private bool choiceShown = false;
     private int currentDialogueLine = 0;
@@ -77,18 +91,15 @@ public class Act2ChoiceManager : MonoBehaviour
 
     void Start()
     {
-        // Setup audio
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        // Set text labels
         if (choice1Text != null) choice1Text.text = choice1Label;
         if (choice2Text != null) choice2Text.text = choice2Label;
 
-        // Add button listeners
         if (choice1Button != null)
         {
             choice1Button.onClick.AddListener(OnChoice1Selected);
@@ -98,7 +109,6 @@ public class Act2ChoiceManager : MonoBehaviour
             choice2Button.onClick.AddListener(OnChoice2Selected);
         }
 
-        // Hide panels at start
         HideChoicePanel();
 
         if (dialogueBox != null)
@@ -111,38 +121,26 @@ public class Act2ChoiceManager : MonoBehaviour
             goodEndingPanel.SetActive(false);
         }
 
-        if (badEndingPanel != null)
-        {
-            badEndingPanel.SetActive(false);
-        }
-
         Debug.Log("[Act2Choice] Script initialized!");
     }
 
     void Update()
     {
-        // Handle dialogue progression
         if (dialogueActive && Input.GetMouseButtonDown(0))
         {
+            PlayClickSound();
+
             if (isTyping)
             {
-                // Skip typing
                 StopAllCoroutines();
 
-                if (isHonestRoute)
-                {
-                    dialogueText.text = honestDialogues[currentDialogueLine];
-                }
-                else
-                {
-                    dialogueText.text = lieDialogues[currentDialogueLine].text;
-                }
+                DialogueLine[] currentDialogues = isHonestRoute ? honestDialogues : lieDialogues;
+                dialogueText.text = currentDialogues[currentDialogueLine].text;
 
                 isTyping = false;
             }
             else
             {
-                // Next line
                 NextDialogueLine();
             }
         }
@@ -155,7 +153,6 @@ public class Act2ChoiceManager : MonoBehaviour
             choicePanel.SetActive(true);
             choiceShown = true;
 
-            // Unlock cursor untuk klik button
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
@@ -173,44 +170,71 @@ public class Act2ChoiceManager : MonoBehaviour
         {
             choicePanel.SetActive(false);
             choiceShown = false;
-
-            Debug.Log("[Act2Choice] Choice Panel disembunyikan!");
         }
     }
 
     void OnChoice1Selected()
     {
-        Debug.Log("[Act2Choice] ===== PILIHAN 1: MENGAKU (JUJUR) =====");
+        Debug.Log("[Act2Choice] ===== ROUTE 1: JUJUR → GOOD ENDING =====");
 
         PlayClickSound();
         HideChoicePanel();
 
         isHonestRoute = true;
-        StartDialogueSequence();
+
+        // Delay sedikit sebelum start dialogue (untuk ensure panel sudah hide)
+        Invoke("StartDialogueSequence", 0.2f);
     }
 
     void OnChoice2Selected()
     {
-        Debug.Log("[Act2Choice] ===== PILIHAN 2: BOHONG =====");
+        Debug.Log("[Act2Choice] ===== ROUTE 2: BOHONG → LANJUT ACT 3 =====");
 
         PlayClickSound();
         HideChoicePanel();
 
         isHonestRoute = false;
-        StartDialogueSequence();
+
+        // Delay sedikit sebelum start dialogue (untuk ensure panel sudah hide)
+        Invoke("StartDialogueSequence", 0.2f);
     }
 
     void StartDialogueSequence()
     {
+        Debug.Log("[Act2Choice] 🎭 StartDialogueSequence() CALLED!");
+        Debug.Log($"[Act2Choice] This GameObject active: {gameObject.activeInHierarchy}");
+        Debug.Log($"[Act2Choice] This GameObject name: {gameObject.name}");
+
         currentDialogueLine = 0;
         dialogueActive = true;
 
         if (dialogueBox != null)
         {
+            Debug.Log($"[Act2Choice] DialogueBox found: {dialogueBox.name}");
             dialogueBox.SetActive(true);
+            Debug.Log("[Act2Choice] DialogueBox activated!");
+        }
+        else
+        {
+            Debug.LogError("[Act2Choice] ❌ DialogueBox is NULL!");
+            return;
         }
 
-        StartCoroutine(TypeDialogueLine());
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Debug.Log($"[Act2Choice] Starting {(isHonestRoute ? "HONEST" : "LIE")} dialogue sequence...");
+
+        // START COROUTINE DENGAN SAFETY CHECK
+        if (gameObject.activeInHierarchy)
+        {
+            StartCoroutine(TypeDialogueLine());
+            Debug.Log("[Act2Choice] ✅ Coroutine started successfully!");
+        }
+        else
+        {
+            Debug.LogError("[Act2Choice] ❌ Cannot start coroutine - GameObject is inactive!");
+        }
     }
 
     IEnumerator TypeDialogueLine()
@@ -218,26 +242,15 @@ public class Act2ChoiceManager : MonoBehaviour
         isTyping = true;
         dialogueText.text = "";
 
-        string textToType;
-        string speakerName;
-
-        if (isHonestRoute)
-        {
-            textToType = honestDialogues[currentDialogueLine];
-            speakerName = "JANNAH";
-        }
-        else
-        {
-            textToType = lieDialogues[currentDialogueLine].text;
-            speakerName = lieDialogues[currentDialogueLine].speaker;
-        }
+        DialogueLine[] currentDialogues = isHonestRoute ? honestDialogues : lieDialogues;
+        DialogueLine currentLine = currentDialogues[currentDialogueLine];
 
         if (dialogueNameText != null)
         {
-            dialogueNameText.text = speakerName;
+            dialogueNameText.text = currentLine.speaker;
         }
 
-        foreach (char c in textToType.ToCharArray())
+        foreach (char c in currentLine.text.ToCharArray())
         {
             dialogueText.text += c;
             yield return new WaitForSeconds(textSpeed);
@@ -250,9 +263,9 @@ public class Act2ChoiceManager : MonoBehaviour
     {
         currentDialogueLine++;
 
-        int maxLines = isHonestRoute ? honestDialogues.Length : lieDialogues.Length;
+        DialogueLine[] currentDialogues = isHonestRoute ? honestDialogues : lieDialogues;
 
-        if (currentDialogueLine < maxLines)
+        if (currentDialogueLine < currentDialogues.Length)
         {
             StartCoroutine(TypeDialogueLine());
         }
@@ -273,32 +286,35 @@ public class Act2ChoiceManager : MonoBehaviour
 
         Debug.Log("[Act2Choice] Dialogue sequence finished!");
 
-        // Show appropriate ending
         if (isHonestRoute)
         {
+            // ROUTE 1: GOOD ENDING
             ShowGoodEnding();
         }
         else
         {
-            ShowBadEnding();
+            // ROUTE 2: LANJUT KE ACT 3
+            PrepareAct3Transition();
         }
     }
 
     void ShowGoodEnding()
     {
-        Debug.Log("[Act2Choice] 🎉 SHOWING GOOD ENDING - Pelukan Bahagia!");
+        Debug.Log("[Act2Choice] 🎉 SHOWING GOOD ENDING - GAME SELESAI!");
 
         if (goodEndingPanel != null)
         {
             goodEndingPanel.SetActive(true);
-
-            // Set image jika ada
-            if (goodEndingImage != null && happyFamilySprite != null)
-            {
-                goodEndingImage.sprite = happyFamilySprite;
-            }
-
             Debug.Log("[Act2Choice] ✅ Good Ending Panel displayed!");
+
+            // Play music jika ada
+            if (goodEndingMusic != null && audioSource != null)
+            {
+                audioSource.clip = goodEndingMusic;
+                audioSource.loop = true;
+                audioSource.Play();
+                Debug.Log("[Act2Choice] 🎵 Good Ending Music playing!");
+            }
 
             if (loadMainMenuAfterEnding)
             {
@@ -311,31 +327,46 @@ public class Act2ChoiceManager : MonoBehaviour
         }
     }
 
-    void ShowBadEnding()
+    void PrepareAct3Transition()
     {
-        Debug.Log("[Act2Choice] 💔 SHOWING BAD ENDING - Hati Retak!");
+        Debug.Log("[Act2Choice] ⏭️ PREPARING ACT 3 TRANSITION...");
 
-        if (badEndingPanel != null)
+        // Set progress ke Act 3
+        if (GameProgressManager.Instance != null)
         {
-            badEndingPanel.SetActive(true);
-
-            // Set image jika ada
-            if (badEndingImage != null && brokenHeartSprite != null)
-            {
-                badEndingImage.sprite = brokenHeartSprite;
-            }
-
-            Debug.Log("[Act2Choice] ✅ Bad Ending Panel displayed!");
-
-            if (loadMainMenuAfterEnding)
-            {
-                StartCoroutine(LoadMainMenuAfterDelay());
-            }
+            GameProgressManager.Instance.SetProgress(act3Number, act3Day);
+            Debug.Log($"[Act2Choice] ✅ Progress set to ACT {act3Number} DAY {act3Day}");
         }
         else
         {
-            Debug.LogError("[Act2Choice] ❌ Bad Ending Panel not assigned!");
+            Debug.LogWarning("[Act2Choice] ⚠️ GameProgressManager not found!");
         }
+
+        if (loadAct3AfterLieDialogue)
+        {
+            StartCoroutine(LoadAct3AfterDelay());
+        }
+        else
+        {
+            Debug.Log("[Act2Choice] Auto-load Act 3 disabled. Waiting for manual trigger.");
+        }
+    }
+
+    IEnumerator LoadAct3AfterDelay()
+    {
+        Debug.Log($"[Act2Choice] Loading Act 3 in {delayBeforeAct3} seconds...");
+
+        yield return new WaitForSeconds(delayBeforeAct3);
+
+        Debug.Log("[Act2Choice] 🎮 Loading Act 3 via Loading Scene...");
+
+        // Stop music
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene(loadingSceneName);
     }
 
     IEnumerator LoadMainMenuAfterDelay()
@@ -343,6 +374,13 @@ public class Act2ChoiceManager : MonoBehaviour
         yield return new WaitForSeconds(endingDisplayTime);
 
         Debug.Log("[Act2Choice] Loading Main Menu...");
+
+        // Stop music
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+
         UnityEngine.SceneManagement.SceneManager.LoadScene(mainMenuSceneName);
     }
 
@@ -357,5 +395,12 @@ public class Act2ChoiceManager : MonoBehaviour
     public bool IsChoiceShown()
     {
         return choiceShown;
+    }
+
+    // PUBLIC FUNCTION - Untuk dipanggil manual jika perlu
+    public void ManualLoadAct3()
+    {
+        Debug.Log("[Act2Choice] Manual Act 3 load triggered!");
+        PrepareAct3Transition();
     }
 }
