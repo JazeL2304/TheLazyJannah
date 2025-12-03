@@ -16,7 +16,7 @@ public class Act3DialogueManager : MonoBehaviour
 
     [Header("🔊 Audio Settings")]
     public AudioClip clickSound;
-    public AudioClip doorKnockSound; // ← BARU - SFX pintu ketok!
+    public AudioClip doorKnockSound; // SFX pintu ketok!
     private AudioSource audioSource;
 
     [System.Serializable]
@@ -81,6 +81,10 @@ public class Act3DialogueManager : MonoBehaviour
     public float delayBeforeDoorKnock = 1f; // Delay sebelum pintu ketok
     public float delayAfterDoorKnock = 1.5f; // Delay setelah sound selesai
 
+    [Header("🎯 OBJECTIVE TRIGGER (BARU!)")]
+    public Act3ObjectiveManager objectiveManager; // Reference ke objective manager
+    public float delayBeforeObjective = 1f; // Delay sebelum objective muncul
+
     private int currentLine = 0;
     private bool isTyping = false;
     private bool dialogueActive = false;
@@ -100,6 +104,16 @@ public class Act3DialogueManager : MonoBehaviour
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
+        }
+
+        // Auto-detect objective manager
+        if (objectiveManager == null)
+        {
+            objectiveManager = FindObjectOfType<Act3ObjectiveManager>();
+            if (objectiveManager != null)
+            {
+                Debug.Log("[Act3Dialogue] Act3ObjectiveManager auto-detected!");
+            }
         }
 
         // Check if Act 3
@@ -219,7 +233,7 @@ public class Act3DialogueManager : MonoBehaviour
             }
             else
             {
-                // Dialog kedua selesai → end dialogue
+                // Dialog kedua selesai → end dialogue + trigger objective
                 EndDialogue();
             }
         }
@@ -284,7 +298,27 @@ public class Act3DialogueManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        Debug.Log("[Act3Dialogue] All dialogues finished!");
+        Debug.Log("[Act3Dialogue] ✅ All dialogues finished!");
+
+        // ✅ TRIGGER OBJECTIVE SETELAH DIALOG SELESAI!
+        StartCoroutine(TriggerObjectiveAfterDelay());
+    }
+
+    IEnumerator TriggerObjectiveAfterDelay()
+    {
+        Debug.Log($"[Act3Dialogue] Waiting {delayBeforeObjective} seconds before showing objective...");
+
+        yield return new WaitForSeconds(delayBeforeObjective);
+
+        if (objectiveManager != null)
+        {
+            objectiveManager.TriggerObjective();
+            Debug.Log("[Act3Dialogue] ✅ Objective triggered!");
+        }
+        else
+        {
+            Debug.LogError("[Act3Dialogue] ❌ Act3ObjectiveManager not found!");
+        }
     }
 
     void PlayClickSound()
