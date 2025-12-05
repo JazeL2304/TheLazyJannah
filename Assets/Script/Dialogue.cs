@@ -48,39 +48,63 @@ public class Dialogue : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("[Dialogue] ========== ACT 1 DIALOGUE START ==========");
+
+        // VALIDASI COMPONENTS
         if (nameTextComponent == null)
         {
-            Debug.LogError("ERROR: Name Text Component belum diisi!");
+            Debug.LogError("[Dialogue] ❌ Name Text Component NULL!");
             return;
         }
 
         if (dialogueTextComponent == null)
         {
-            Debug.LogError("ERROR: Dialogue Text Component belum diisi!");
+            Debug.LogError("[Dialogue] ❌ Dialogue Text Component NULL!");
             return;
         }
 
         if (dialogueBox == null)
         {
-            Debug.LogError("ERROR: Dialogue Box belum diisi!");
+            Debug.LogError("[Dialogue] ❌ Dialogue Box NULL!");
             return;
         }
 
         if (lines == null || lines.Length == 0)
         {
-            Debug.LogError("ERROR: Dialog Lines kosong!");
+            Debug.LogError("[Dialogue] ❌ Dialog Lines KOSONG!");
             return;
         }
+
+        Debug.Log($"[Dialogue] ✅ All components valid!");
+        Debug.Log($"[Dialogue] Total lines: {lines.Length}");
 
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        Debug.Log("Dialog Lines: " + lines.Length + " lines");
+        // CEK GAMEPROGRESSMANAGER
+        if (GameProgressManager.Instance != null)
+        {
+            int currentAct = GameProgressManager.Instance.currentAct;
+            Debug.Log($"[Dialogue] Current Act: {currentAct}");
+
+            if (currentAct != 1)
+            {
+                Debug.LogWarning($"[Dialogue] ⚠️ Not Act 1 (Current: {currentAct}) - Disabling dialogue!");
+                this.enabled = false;
+                return;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Dialogue] ⚠️ GameProgressManager not found!");
+        }
 
         dialogueTextComponent.text = string.Empty;
-        StartDialogue();
+
+        Debug.Log("[Dialogue] Starting dialogue in 0.5 seconds...");
+        Invoke("StartDialogue", 0.5f); // Small delay untuk ensure scene fully loaded
     }
 
     void Update()
@@ -124,19 +148,23 @@ public class Dialogue : MonoBehaviour
 
     public void StartDialogue()
     {
+        Debug.Log("[Dialogue] ========== START DIALOGUE ==========");
+
         index = 0;
         isPaused = false;
         isPostChoice2Dialogue = false;
+
         ShowDialogueBox();
         DisplayLine();
-        Debug.Log("Dialog dimulai!");
+
+        Debug.Log("[Dialogue] Dialogue started! Click to continue...");
     }
 
     public void ResumeDialogue()
     {
         if (isPaused)
         {
-            Debug.Log("Resume dialog dari line " + (index + 1));
+            Debug.Log("[Dialogue] Resume dialog dari line " + (index + 1));
             isPaused = false;
             ShowDialogueBox();
             index++;
@@ -148,7 +176,7 @@ public class Dialogue : MonoBehaviour
     {
         if (continueFromLineAfterChoice2 >= 0 && continueFromLineAfterChoice2 < lines.Length)
         {
-            Debug.Log("Dialog lanjutan setelah choice 2 - Line " + (continueFromLineAfterChoice2 + 1));
+            Debug.Log("[Dialogue] Dialog lanjutan setelah choice 2 - Line " + (continueFromLineAfterChoice2 + 1));
             index = continueFromLineAfterChoice2;
             isPostChoice2Dialogue = true;
             ShowDialogueBox();
@@ -156,7 +184,7 @@ public class Dialogue : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Tidak ada dialog lanjutan. Check 'Continue From Line After Choice 2'");
+            Debug.LogWarning("[Dialogue] Tidak ada dialog lanjutan. Check 'Continue From Line After Choice 2'");
         }
     }
 
@@ -167,6 +195,8 @@ public class Dialogue : MonoBehaviour
             EndDialogue();
             return;
         }
+
+        Debug.Log($"[Dialogue] Displaying line {index}: {lines[index].sentence}");
 
         nameTextComponent.text = lines[index].characterName;
         StartCoroutine(TypeLine());
@@ -190,7 +220,7 @@ public class Dialogue : MonoBehaviour
     {
         if (isPostChoice2Dialogue && index >= endLineAfterChoice2)
         {
-            Debug.Log("Dialog post-choice 2 selesai di line " + (index + 1));
+            Debug.Log("[Dialogue] Dialog post-choice 2 selesai di line " + (index + 1));
             EndDialogueAfterChoice2();
             return;
         }
@@ -199,13 +229,13 @@ public class Dialogue : MonoBehaviour
         {
             isPaused = true;
             HideDialogueBox();
-            Debug.Log("Dialog PAUSE setelah line " + (index + 1));
+            Debug.Log("[Dialogue] Dialog PAUSE setelah line " + (index + 1));
             return;
         }
 
         if (showChoiceAfterLine && index == showChoiceAtLineIndex)
         {
-            Debug.Log("Menampilkan pilihan setelah line " + (index + 1));
+            Debug.Log("[Dialogue] Menampilkan pilihan setelah line " + (index + 1));
             HideDialogueBox();
 
             if (dialogueChoice != null)
@@ -214,7 +244,7 @@ public class Dialogue : MonoBehaviour
             }
             else
             {
-                Debug.LogError("DialogueChoice belum di-set!");
+                Debug.LogError("[Dialogue] DialogueChoice belum di-set!");
             }
             return;
         }
@@ -233,14 +263,14 @@ public class Dialogue : MonoBehaviour
     void EndDialogue()
     {
         HideDialogueBox();
-        Debug.Log("Dialog selesai!");
+        Debug.Log("[Dialogue] Dialog selesai!");
     }
 
     void EndDialogueAfterChoice2()
     {
         HideDialogueBox();
         isPostChoice2Dialogue = false;
-        Debug.Log("Dialog setelah choice 2 selesai - Memulai stealth mission");
+        Debug.Log("[Dialogue] Dialog setelah choice 2 selesai - Memulai stealth mission");
 
         GameManager gameManager = FindObjectOfType<GameManager>();
         if (gameManager != null)
@@ -249,19 +279,18 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    // ✅ FUNCTION BARU - Dipanggil dari EndingDialogueTrigger!
     public void ShowEndingCanvas()
     {
-        Debug.Log("[DialogueManager] ✅ ShowEndingCanvas() called!");
+        Debug.Log("[Dialogue] ✅ ShowEndingCanvas() called!");
 
         if (endingCanvas != null)
         {
             endingCanvas.SetActive(true);
-            Debug.Log("[DialogueManager] 🎬 Canvas Act 1 End MUNCUL!");
+            Debug.Log("[Dialogue] 🎬 Canvas Act 1 End MUNCUL!");
         }
         else
         {
-            Debug.LogError("[DialogueManager] ❌ endingCanvas belum di-assign di Inspector!");
+            Debug.LogError("[Dialogue] ❌ endingCanvas belum di-assign di Inspector!");
         }
     }
 
@@ -270,6 +299,15 @@ public class Dialogue : MonoBehaviour
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(true);
+            Debug.Log("[Dialogue] ✅ Dialogue Box SHOWN!");
+
+            // Unlock cursor untuk bisa klik
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Debug.LogError("[Dialogue] ❌ Cannot show dialogue box - it's NULL!");
         }
     }
 
@@ -278,6 +316,7 @@ public class Dialogue : MonoBehaviour
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
+            Debug.Log("[Dialogue] Dialogue Box hidden");
         }
     }
 
