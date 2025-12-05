@@ -86,12 +86,10 @@ public class Act2ChoiceManager : MonoBehaviour
     public string mainMenuSceneName = "Main Menu";
 
     [Header("🎬 BAD ENDING PANEL (ROUTE 2)")]
-    public GameObject badEndingPanel; // ← BARU - Canvas Act 2 End
-    public float badEndingDisplayTime = 5f; // ← BARU - Berapa lama canvas muncul
+    public GameObject badEndingPanel;
 
     [Header("⏭️ ACT 3 PROGRESSION (ROUTE 2)")]
     public bool loadAct3AfterLieDialogue = true;
-    public float delayBeforeAct3 = 2f;
     public string loadingSceneName = "LoadingScene";
     public int act3Number = 3;
     public int act3Day = 60;
@@ -139,7 +137,6 @@ public class Act2ChoiceManager : MonoBehaviour
             goodEndingPanel.SetActive(false);
         }
 
-        // ← BARU - Hide bad ending panel
         if (badEndingPanel != null)
         {
             badEndingPanel.SetActive(false);
@@ -359,7 +356,7 @@ public class Act2ChoiceManager : MonoBehaviour
         }
         else
         {
-            // ← BARU - ROUTE 2: Tampilkan Bad Ending Canvas dulu sebelum Act 3
+            // ROUTE 2: Tampilkan Bad Ending Canvas & LANGSUNG load Act 3
             ShowBadEndingCanvas();
         }
     }
@@ -386,44 +383,54 @@ public class Act2ChoiceManager : MonoBehaviour
         }
     }
 
-    // ← BARU - Function untuk tampilkan Bad Ending Canvas
     void ShowBadEndingCanvas()
     {
         Debug.Log("[Act2Choice] 🎬 SHOWING BAD ENDING CANVAS - ACT 2 END!");
+
+        // LANGSUNG SET PROGRESS KE ACT 3
+        if (GameProgressManager.Instance != null)
+        {
+            GameProgressManager.Instance.SetProgress(act3Number, act3Day);
+            Debug.Log($"[Act2Choice] ✅ Progress set to ACT {act3Number} DAY {act3Day}");
+        }
 
         if (badEndingPanel != null)
         {
             badEndingPanel.SetActive(true);
             Debug.Log("[Act2Choice] ✅ Bad Ending Canvas displayed!");
 
-            // Cursor tetap visible buat baca canvas
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // Setelah beberapa detik, lanjut ke Act 3
-            StartCoroutine(WaitThenPrepareAct3());
+            // LANGSUNG LOAD ACT 3 DENGAN DELAY MINIMAL!
+            StartCoroutine(LoadAct3Immediately());
         }
         else
         {
             Debug.LogWarning("[Act2Choice] ⚠️ Bad Ending Panel not assigned! Langsung ke Act 3...");
-            PrepareAct3Transition();
+            LoadAct3Now();
         }
     }
 
-    // ← BARU - Coroutine tunggu canvas, lalu ke Act 3
-    IEnumerator WaitThenPrepareAct3()
+    IEnumerator LoadAct3Immediately()
     {
-        Debug.Log($"[Act2Choice] Waiting {badEndingDisplayTime} seconds before Act 3...");
-        yield return new WaitForSeconds(badEndingDisplayTime);
+        // Delay 0.5 detik aja biar canvas kebaca sebentar
+        yield return new WaitForSeconds(0.5f);
 
-        // Hide canvas
-        if (badEndingPanel != null)
+        // LANGSUNG LOAD SCENE!
+        LoadAct3Now();
+    }
+
+    void LoadAct3Now()
+    {
+        Debug.Log("[Act2Choice] 🎮 Loading Act 3 via Loading Scene NOW!");
+
+        if (audioSource != null)
         {
-            badEndingPanel.SetActive(false);
+            audioSource.Stop();
         }
 
-        // Lanjut ke Act 3
-        PrepareAct3Transition();
+        UnityEngine.SceneManagement.SceneManager.LoadScene(loadingSceneName);
     }
 
     public void ShowGoodEndingAfterCleanup()
@@ -436,38 +443,6 @@ public class Act2ChoiceManager : MonoBehaviour
         }
 
         ShowGoodEnding();
-    }
-
-    void PrepareAct3Transition()
-    {
-        Debug.Log("[Act2Choice] ⏭️ PREPARING ACT 3 TRANSITION...");
-
-        if (GameProgressManager.Instance != null)
-        {
-            GameProgressManager.Instance.SetProgress(act3Number, act3Day);
-            Debug.Log($"[Act2Choice] ✅ Progress set to ACT {act3Number} DAY {act3Day}");
-        }
-
-        if (loadAct3AfterLieDialogue)
-        {
-            StartCoroutine(LoadAct3AfterDelay());
-        }
-    }
-
-    IEnumerator LoadAct3AfterDelay()
-    {
-        Debug.Log($"[Act2Choice] Loading Act 3 in {delayBeforeAct3} seconds...");
-
-        yield return new WaitForSeconds(delayBeforeAct3);
-
-        Debug.Log("[Act2Choice] 🎮 Loading Act 3 via Loading Scene...");
-
-        if (audioSource != null)
-        {
-            audioSource.Stop();
-        }
-
-        UnityEngine.SceneManagement.SceneManager.LoadScene(loadingSceneName);
     }
 
     IEnumerator LoadMainMenuAfterDelay()
@@ -500,7 +475,7 @@ public class Act2ChoiceManager : MonoBehaviour
     public void ManualLoadAct3()
     {
         Debug.Log("[Act2Choice] Manual Act 3 load triggered!");
-        PrepareAct3Transition();
+        LoadAct3Now();
     }
 
     void ShowPhoneEvidence()
