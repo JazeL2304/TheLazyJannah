@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement; // ✅ TAMBAH INI!
 
 public class Act3FightManager : MonoBehaviour
 {
@@ -47,6 +48,7 @@ public class Act3FightManager : MonoBehaviour
     public GameObject victoryPanel;
     public GameObject defeatPanel;
     public string nextSceneName = "Main Menu";
+    public float endingWaitTime = 5f; // ✅ TAMBAH INI - waktu tunggu sebelum load main menu
 
     [Header("📹 CAMERA SHAKE")]
     public bool enableCameraShake = true;
@@ -417,7 +419,14 @@ public class Act3FightManager : MonoBehaviour
 
         ShowActionText("VICTORY! You survived!", Color.green, 5f);
 
-        Invoke("LoadNextScene", 5f);
+        // ✅ RESET PROGRESS KE ACT 1 DAY 1
+        if (GameProgressManager.Instance != null)
+        {
+            GameProgressManager.Instance.ResetProgress();
+            Debug.Log("[Act3Fight] ✅ Victory! Progress RESET to ACT 1 DAY 1!");
+        }
+
+        Invoke("LoadMainMenu", endingWaitTime);
     }
 
     void Defeat()
@@ -444,25 +453,28 @@ public class Act3FightManager : MonoBehaviour
 
         ShowActionText("DEFEATED... You were taken away...", Color.red, 5f);
 
-        Invoke("RestartFight", 5f);
-    }
-
-    void LoadNextScene()
-    {
-        Debug.Log("[Act3Fight] Loading: " + nextSceneName);
-        UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
-    }
-
-    void RestartFight()
-    {
-        Debug.Log("[Act3Fight] Restarting fight...");
-
-        if (defeatPanel != null)
+        // ✅ RESET PROGRESS KE ACT 1 DAY 1
+        if (GameProgressManager.Instance != null)
         {
-            defeatPanel.SetActive(false);
+            GameProgressManager.Instance.ResetProgress();
+            Debug.Log("[Act3Fight] ✅ Defeat! Progress RESET to ACT 1 DAY 1!");
         }
 
-        StartFight();
+        Invoke("LoadMainMenu", endingWaitTime); // ← UBAH dari RestartFight
+    }
+
+    // ✅ FUNCTION BARU - Load Main Menu
+    void LoadMainMenu()
+    {
+        Debug.Log("[Act3Fight] Loading Main Menu...");
+
+        // Stop semua audio
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+
+        SceneManager.LoadScene(nextSceneName);
     }
 
     void ShowActionText(string message, Color color, float duration)
