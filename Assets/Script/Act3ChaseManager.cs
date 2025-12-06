@@ -294,13 +294,6 @@ public class Act3ChaseManager : MonoBehaviour
         {
             badEndingPanel.SetActive(true);
             Debug.Log("[Act3Chase] 💀 BAD ENDING DISPLAYED!");
-
-            // ✅ RESET PROGRESS KE ACT 1 DAY 1
-            if (GameProgressManager.Instance != null)
-            {
-                GameProgressManager.Instance.ResetProgress();
-                Debug.Log("[Act3Chase] ✅ Progress RESET to ACT 1 DAY 1!");
-            }
         }
         else
         {

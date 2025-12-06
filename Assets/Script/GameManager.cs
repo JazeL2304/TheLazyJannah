@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     public GameObject ibuNPC;
     public GameObject bapakNPC;
     public Dialogue dialogueManager;
-    public QuestManager questManager;
+    public QuestManager questManager;  // TAMBAHAN BARU
 
     [Header("Post-Choice 2 Settings")]
     public bool showDialogueAfterChoice2 = true;
@@ -26,7 +26,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Cek duplicate GameManager
         GameManager[] managers = FindObjectsOfType<GameManager>();
         if (managers.Length > 1)
         {
@@ -34,22 +33,20 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Hide semua panel di awal
         if (happyEndingPanel != null) happyEndingPanel.SetActive(false);
         if (choicePanel != null) choicePanel.SetActive(false);
         if (stealthQuestUI != null) stealthQuestUI.SetActive(false);
 
-        // Hide NPCs di awal
         if (ibuNPC != null) ibuNPC.SetActive(false);
         if (bapakNPC != null) bapakNPC.SetActive(false);
 
-        // Auto-detect QuestManager jika tidak di-assign
+        // AUTO-DETECT QUESTMANAGER - TAMBAHAN BARU
         if (questManager == null)
         {
             questManager = FindObjectOfType<QuestManager>();
         }
 
-        Debug.Log("[GameManager] GameManager initialized!");
+        Debug.Log("GameManager initialized!");
     }
 
     public void OnPlayerChoice(int choice)
@@ -59,41 +56,41 @@ public class GameManager : MonoBehaviour
 
         if (choice == 1)
         {
-            Debug.Log("[GameManager] Player memilih: JANGAN CURI");
+            Debug.Log("Player memilih: JANGAN CURI");
             ShowHappyEnding();
         }
         else if (choice == 2)
         {
-            Debug.Log("[GameManager] Player memilih: AMBIL KARTU KREDIT");
+            Debug.Log("Player memilih: AMBIL KARTU KREDIT");
             StartCoroutine(StartStealthMissionSequence());
         }
     }
 
     void ShowHappyEnding()
     {
-        Debug.Log("[GameManager] >>> ENDING 1/3: HAPPY ENDING <<<");
+        Debug.Log(">>> ENDING 1/3: HAPPY ENDING <<<");
 
-        // Matikan semua panel lain
+        // MATIKAN SEMUA PANEL LAIN DENGAN PAKSA
         if (choicePanel != null)
         {
             choicePanel.SetActive(false);
-            Debug.Log("[GameManager] ChoicePanel dinonaktifkan");
+            Debug.Log("ChoicePanel dinonaktifkan via SetActive(false)");
         }
 
         if (dialogueBox != null)
         {
             dialogueBox.SetActive(false);
-            Debug.Log("[GameManager] DialogueBox dinonaktifkan");
+            Debug.Log("DialogueBox dinonaktifkan");
         }
 
-        // Matikan DialogueManager script
+        // Matikan DialogueManager script juga
         if (dialogueManager != null)
         {
             dialogueManager.gameObject.SetActive(false);
-            Debug.Log("[GameManager] DialogueManager dinonaktifkan");
+            Debug.Log("DialogueManager dinonaktifkan");
         }
 
-        // Reset EventSystem
+        // Disable EventSystem sementara lalu enable lagi untuk reset
         UnityEngine.EventSystems.EventSystem eventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
         if (eventSystem != null)
         {
@@ -101,35 +98,32 @@ public class GameManager : MonoBehaviour
             eventSystem.enabled = true;
         }
 
-        // Tampilkan Happy Ending Panel
         if (happyEndingPanel != null)
         {
             happyEndingPanel.SetActive(true);
-            Debug.Log("[GameManager] HappyEndingPanel ditampilkan");
+            Debug.Log("HappyEndingPanel ditampilkan");
         }
 
-        // Unlock cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Tampilkan main menu button
         if (mainMenuButton != null)
         {
             mainMenuButton.SetActive(true);
         }
 
-        Debug.Log("[GameManager] Game selesai dengan Happy Ending!");
+        Debug.Log("Game selesai dengan Happy Ending!");
     }
 
     IEnumerator StartStealthMissionSequence()
     {
-        Debug.Log("[GameManager] >>> Memulai sequence stealth mission...");
+        Debug.Log(">>> Memulai sequence stealth mission...");
 
         // Matikan ChoicePanel
         if (choicePanel != null)
         {
             choicePanel.SetActive(false);
-            Debug.Log("[GameManager] ChoicePanel dinonaktifkan");
+            Debug.Log("ChoicePanel dinonaktifkan");
         }
 
         yield return new WaitForSeconds(delayBeforeDialogue);
@@ -139,95 +133,79 @@ public class GameManager : MonoBehaviour
         {
             waitingForDialogueComplete = true;
             dialogueManager.ContinueDialogueAfterChoice2();
-            Debug.Log("[GameManager] Dialog lanjutan ditampilkan - Menunggu player klik...");
+            Debug.Log("Dialog lanjutan ditampilkan - Menunggu player klik sampai selesai...");
 
-            // Tunggu sampai dialog selesai
+            // Tunggu sampai dialog selesai (callback dari Dialogue.cs)
             while (waitingForDialogueComplete)
             {
                 yield return null;
             }
 
-            Debug.Log("[GameManager] Dialog selesai - Melanjutkan ke stealth mission");
+            Debug.Log("Dialog selesai - Melanjutkan ke stealth mission");
         }
 
-        // Mulai misi stealth
+        // Mulai misi stealth SETELAH dialog selesai
         StartStealthMission();
     }
 
+    // Fungsi dipanggil dari Dialogue.cs saat dialog post-choice 2 selesai
     public void OnDialogueCompleteAfterChoice2()
     {
-        Debug.Log("[GameManager] Dialog post-choice 2 selesai");
+        Debug.Log("GameManager menerima notifikasi: Dialog post-choice 2 selesai");
         waitingForDialogueComplete = false;
     }
 
     void StartStealthMission()
     {
-        Debug.Log("[GameManager] === MISI STEALTH DIMULAI ===");
+        Debug.Log("=== MISI STEALTH DIMULAI ===");
 
-        // Lock cursor untuk gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // Start quest via QuestManager
+        // START QUEST VIA QUESTMANAGER - TAMBAHAN BARU
         if (questManager != null)
         {
-            questManager.StartQuest(0);
-            Debug.Log("[GameManager] Quest dimulai via QuestManager: MISI STEALTH");
+            questManager.StartQuest(0);  // Start quest index 0 (MISI STEALTH)
+            Debug.Log("Quest dimulai via QuestManager: MISI STEALTH");
         }
         else
         {
-            // Fallback: Tampilkan UI manual
+            // FALLBACK: Tampilkan UI manual jika QuestManager tidak ada
             if (stealthQuestUI != null)
             {
                 stealthQuestUI.SetActive(true);
-                Debug.Log("[GameManager] Quest UI ditampilkan (fallback manual)");
+                Debug.Log("Quest UI ditampilkan (fallback manual)");
             }
         }
 
-        // Aktifkan NPCs
         if (ibuNPC != null)
         {
             ibuNPC.SetActive(true);
-            Debug.Log("[GameManager] NPC Ibu diaktifkan");
+            Debug.Log("NPC Ibu diaktifkan");
         }
 
         if (bapakNPC != null)
         {
             bapakNPC.SetActive(true);
-            Debug.Log("[GameManager] NPC Bapak diaktifkan");
+            Debug.Log("NPC Bapak diaktifkan");
         }
 
-        Debug.Log("[GameManager] Tekan F untuk berdiri dan mulai misi!");
+        Debug.Log("Tekan F untuk berdiri dan mulai misi!");
     }
-
     public void EndGame1()
     {
-        Debug.Log("[GameManager] Loading Phone scene...");
-        SceneManager.LoadScene("Phone");
+        SceneManager.LoadScene("Phone"); // atau nama scene ending kamu
     }
-
     public void LoadMainMenu()
     {
-        Debug.Log("[GameManager] Loading Main Menu...");
-
-        // ✅ JANGAN RESET PROGRESS - Progress harus persistent!
-        if (GameProgressManager.Instance != null)
-        {
-            int act = GameProgressManager.Instance.currentAct;
-            int day = GameProgressManager.Instance.currentDay;
-            Debug.Log($"[GameManager] Loading Main Menu with progress: ACT {act} DAY {day}");
-        }
-
-        // Reset timescale
+        Debug.Log("Loading Main Menu...");
         Time.timeScale = 1;
-
-        // Load main menu
         SceneManager.LoadScene("Main Menu");
     }
 
     public void QuitGame()
     {
-        Debug.Log("[GameManager] Quitting game...");
+        Debug.Log("Quitting game...");
         Application.Quit();
 
 #if UNITY_EDITOR
@@ -235,7 +213,6 @@ public class GameManager : MonoBehaviour
 #endif
     }
 
-    // Getter functions
     public int GetPlayerChoice()
     {
         return playerChoice;
@@ -251,3 +228,4 @@ public class GameManager : MonoBehaviour
         return playerChoice == 2;
     }
 }
+    
