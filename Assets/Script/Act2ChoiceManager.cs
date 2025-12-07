@@ -87,18 +87,17 @@ public class Act2ChoiceManager : MonoBehaviour
 
     [Header("🎬 BAD ENDING PANEL (ROUTE 2)")]
     public GameObject badEndingPanel;
-    public float badEndingDisplayTime = 5f;
+    public float badEndingDisplayTime = 2f; // ← Dipercepat lagi!
 
     [Header("⏭️ ACT 3 PROGRESSION (ROUTE 2)")]
     public bool loadAct3AfterLieDialogue = true;
-    public float delayBeforeAct3 = 2f;
     public string loadingSceneName = "LoadingScene";
     public int act3Number = 3;
-    public int act3Day = 60;
+    public int act3Day = 60; // ← CEK INI! Harusnya 60 bukan 100!
 
     [Header("🌑 BLACK FADE TRANSITION")]
-    public Image blackFadeImage; // Drag Image hitam fullscreen dari Canvas
-    public float fadeOutDuration = 1.5f; // Durasi fade ke hitam
+    public Image blackFadeImage;
+    public float fadeOutDuration = 0.8f; // ← Lebih cepat lagi!
 
     [Header("🧹 CLEANUP QUEST (ROUTE 1)")]
     public int pauseAtLineIndex = 9;
@@ -152,27 +151,23 @@ public class Act2ChoiceManager : MonoBehaviour
         if (blackFadeImage != null)
         {
             Color c = blackFadeImage.color;
-            c.a = 0f; // Start transparent
+            c.a = 0f;
             blackFadeImage.color = c;
-            blackFadeImage.gameObject.SetActive(true); // Keep active but transparent
+            blackFadeImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("[Act2Choice] ⚠️ Black Fade Image not assigned!");
         }
 
         if (cleanupManager == null)
         {
             cleanupManager = FindObjectOfType<TrashCleanupManager>();
-            if (cleanupManager != null)
-            {
-                Debug.Log("[Act2Choice] TrashCleanupManager auto-detected!");
-            }
         }
 
         if (cameraTransform == null)
         {
             cameraTransform = Camera.main.transform;
-            if (cameraTransform != null)
-            {
-                Debug.Log("[Act2Choice] Camera auto-detected!");
-            }
         }
 
         Debug.Log("[Act2Choice] Script initialized!");
@@ -196,10 +191,8 @@ public class Act2ChoiceManager : MonoBehaviour
             if (isTyping)
             {
                 StopAllCoroutines();
-
                 DialogueLine[] currentDialogues = isHonestRoute ? honestDialogues : lieDialogues;
                 dialogueText.text = currentDialogues[currentDialogueLine].text;
-
                 isTyping = false;
             }
             else
@@ -215,15 +208,9 @@ public class Act2ChoiceManager : MonoBehaviour
         {
             choicePanel.SetActive(true);
             choiceShown = true;
-
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-
             Debug.Log("[Act2Choice] Choice Panel ditampilkan!");
-        }
-        else
-        {
-            Debug.LogError("[Act2Choice] Choice Panel NULL! Set di Inspector!");
         }
     }
 
@@ -239,31 +226,23 @@ public class Act2ChoiceManager : MonoBehaviour
     void OnChoice1Selected()
     {
         Debug.Log("[Act2Choice] ===== ROUTE 1: JUJUR → GOOD ENDING =====");
-
         PlayClickSound();
         HideChoicePanel();
-
         isHonestRoute = true;
-
         Invoke("StartDialogueSequence", 0.2f);
     }
 
     void OnChoice2Selected()
     {
         Debug.Log("[Act2Choice] ===== ROUTE 2: BOHONG → LANJUT ACT 3 =====");
-
         PlayClickSound();
         HideChoicePanel();
-
         isHonestRoute = false;
-
         Invoke("StartDialogueSequence", 0.2f);
     }
 
     void StartDialogueSequence()
     {
-        Debug.Log("[Act2Choice] 🎭 StartDialogueSequence() CALLED!");
-
         currentDialogueLine = 0;
         dialogueActive = true;
         isPausedForCleanup = false;
@@ -318,8 +297,6 @@ public class Act2ChoiceManager : MonoBehaviour
 
         if (isHonestRoute && currentDialogueLine == pauseAtLineIndex)
         {
-            Debug.Log("[Act2Choice] 🛑 PAUSE untuk beresin kamar!");
-
             isPausedForCleanup = true;
             dialogueActive = false;
 
@@ -335,12 +312,10 @@ public class Act2ChoiceManager : MonoBehaviour
             {
                 cleanupManager.StartCleanupQuest();
             }
-
             return;
         }
 
         currentDialogueLine++;
-
         DialogueLine[] currentDialogues = isHonestRoute ? honestDialogues : lieDialogues;
 
         if (currentDialogueLine < currentDialogues.Length)
@@ -362,24 +337,18 @@ public class Act2ChoiceManager : MonoBehaviour
             dialogueBox.SetActive(false);
         }
 
-        Debug.Log("[Act2Choice] Dialogue sequence finished!");
-
         if (isHonestRoute)
         {
-            Debug.LogWarning("[Act2Choice] Honest route finished without cleanup quest!");
             ShowGoodEnding();
         }
         else
         {
-            // ROUTE 2: Tampilkan Bad Ending Canvas dulu sebelum Act 3
             ShowBadEndingCanvas();
         }
     }
 
     void ShowGoodEnding()
     {
-        Debug.Log("[Act2Choice] 🎉 SHOWING GOOD ENDING - GAME SELESAI!");
-
         if (goodEndingPanel != null)
         {
             goodEndingPanel.SetActive(true);
@@ -400,55 +369,39 @@ public class Act2ChoiceManager : MonoBehaviour
 
     void ShowBadEndingCanvas()
     {
-        Debug.Log("[Act2Choice] 🎬 SHOWING BAD ENDING CANVAS - ACT 2 END!");
+        Debug.Log("[Act2Choice] 🎬 BAD ENDING - Starting instant transition!");
 
         if (badEndingPanel != null)
         {
             badEndingPanel.SetActive(true);
-            Debug.Log("[Act2Choice] ✅ Bad Ending Canvas displayed!");
-
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // Setelah beberapa detik, lanjut ke Act 3 dengan fade
-            StartCoroutine(WaitThenPrepareAct3());
+            // LANGSUNG KE FADE SEQUENCE - NO WAIT!
+            StartCoroutine(InstantFadeToAct3());
         }
         else
         {
-            Debug.LogWarning("[Act2Choice] ⚠️ Bad Ending Panel not assigned! Langsung ke Act 3...");
-            PrepareAct3Transition();
+            // Kalau ga ada panel, langsung fade aja
+            StartCoroutine(DirectFadeToAct3());
         }
     }
 
-    IEnumerator WaitThenPrepareAct3()
+    // ✅ BARU - INSTANT FADE (Minimal delay!)
+    IEnumerator InstantFadeToAct3()
     {
-        Debug.Log($"[Act2Choice] Waiting {badEndingDisplayTime} seconds before Act 3...");
+        Debug.Log("[Act2Choice] Starting instant fade sequence...");
+
+        // Tampilkan canvas sebentar (2 detik aja)
         yield return new WaitForSeconds(badEndingDisplayTime);
 
-        // FADE OUT BAD ENDING PANEL
+        // INSTANT HIDE - Ga usah fade panel!
         if (badEndingPanel != null)
         {
-            CanvasGroup canvasGroup = badEndingPanel.GetComponent<CanvasGroup>();
-
-            if (canvasGroup == null)
-            {
-                canvasGroup = badEndingPanel.AddComponent<CanvasGroup>();
-            }
-
-            float fadeTime = 1f;
-            float elapsed = 0f;
-
-            while (elapsed < fadeTime)
-            {
-                elapsed += Time.deltaTime;
-                canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / fadeTime);
-                yield return null;
-            }
-
             badEndingPanel.SetActive(false);
         }
 
-        // FADE TO BLACK SCREEN
+        // LANGSUNG FADE TO BLACK!
         if (blackFadeImage != null)
         {
             float elapsed = 0f;
@@ -469,64 +422,87 @@ public class Act2ChoiceManager : MonoBehaviour
             Color finalColor = blackFadeImage.color;
             finalColor.a = 1f;
             blackFadeImage.color = finalColor;
+
+            Debug.Log("[Act2Choice] ✅ Screen BLACK - Loading Act 3 NOW!");
         }
 
-        // Delay tambahan di black screen
-        yield return new WaitForSeconds(0.5f);
-
-        // Lanjut ke Act 3
-        PrepareAct3Transition();
+        // LANGSUNG LOAD - NO DELAY!
+        PrepareAndLoadAct3();
     }
 
-    public void ShowGoodEndingAfterCleanup()
+    // ✅ BARU - Direct fade tanpa panel
+    IEnumerator DirectFadeToAct3()
     {
-        Debug.Log("[Act2Choice] 🎉 Cleanup quest selesai! Showing Good Ending...");
+        Debug.Log("[Act2Choice] Direct fade (no panel) - instant!");
 
-        if (dialogueBox != null)
+        if (blackFadeImage != null)
         {
-            dialogueBox.SetActive(false);
+            float elapsed = 0f;
+
+            while (elapsed < fadeOutDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeOutDuration);
+
+                Color c = blackFadeImage.color;
+                c.a = alpha;
+                blackFadeImage.color = c;
+
+                yield return null;
+            }
+
+            Color finalColor = blackFadeImage.color;
+            finalColor.a = 1f;
+            blackFadeImage.color = finalColor;
         }
 
-        ShowGoodEnding();
+        PrepareAndLoadAct3();
     }
 
-    void PrepareAct3Transition()
+    // ✅ BARU - Instant prep & load (NO coroutine delays!)
+    void PrepareAndLoadAct3()
     {
-        Debug.Log("[Act2Choice] ⏭️ PREPARING ACT 3 TRANSITION...");
+        Debug.Log("[Act2Choice] ⏭️ LOADING ACT 3 IMMEDIATELY!");
 
+        // SAVE PROGRESS
         if (GameProgressManager.Instance != null)
         {
             GameProgressManager.Instance.SetProgress(act3Number, act3Day);
-            Debug.Log($"[Act2Choice] ✅ Progress set to ACT {act3Number} DAY {act3Day}");
+
+            // Double-save untuk memastikan!
+            PlayerPrefs.SetInt("CurrentAct", act3Number);
+            PlayerPrefs.SetInt("CurrentDay", act3Day);
+            PlayerPrefs.Save();
+
+            Debug.Log($"[Act2Choice] ✅ SAVED: ACT {act3Number} DAY {act3Day}");
         }
 
-        if (loadAct3AfterLieDialogue)
-        {
-            StartCoroutine(LoadAct3AfterDelay());
-        }
-    }
-
-    IEnumerator LoadAct3AfterDelay()
-    {
-        Debug.Log($"[Act2Choice] Loading Act 3 in {delayBeforeAct3} seconds...");
-
-        yield return new WaitForSeconds(delayBeforeAct3);
-
-        Debug.Log("[Act2Choice] 🎮 Loading Act 3 via Loading Scene...");
-
+        // STOP AUDIO
         if (audioSource != null)
         {
             audioSource.Stop();
         }
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene(loadingSceneName);
+        // LOAD SCENE - INSTANT!
+        if (loadAct3AfterLieDialogue)
+        {
+            Debug.Log("[Act2Choice] 🎮 LOADING SCENE NOW!");
+            UnityEngine.SceneManagement.SceneManager.LoadScene(loadingSceneName);
+        }
+    }
+
+    public void ShowGoodEndingAfterCleanup()
+    {
+        if (dialogueBox != null)
+        {
+            dialogueBox.SetActive(false);
+        }
+        ShowGoodEnding();
     }
 
     IEnumerator LoadMainMenuAfterDelay()
     {
         yield return new WaitForSeconds(endingDisplayTime);
-
-        Debug.Log("[Act2Choice] Loading Main Menu...");
 
         if (audioSource != null)
         {
@@ -549,33 +525,15 @@ public class Act2ChoiceManager : MonoBehaviour
         return choiceShown;
     }
 
-    public void ManualLoadAct3()
-    {
-        Debug.Log("[Act2Choice] Manual Act 3 load triggered!");
-        PrepareAct3Transition();
-    }
-
     void ShowPhoneEvidence()
     {
-        if (phoneEvidencePrefab == null)
-        {
-            Debug.LogWarning("[Act2Choice] Phone Evidence Prefab not assigned!");
-            return;
-        }
-
-        if (cameraTransform == null)
-        {
-            Debug.LogError("[Act2Choice] Camera Transform not found!");
-            return;
-        }
+        if (phoneEvidencePrefab == null || cameraTransform == null) return;
 
         Vector3 spawnPosition = cameraTransform.position + cameraTransform.TransformDirection(phoneOffset);
         Quaternion spawnRotation = cameraTransform.rotation * Quaternion.Euler(phoneRotation);
 
         currentPhoneEvidence = Instantiate(phoneEvidencePrefab, spawnPosition, spawnRotation);
         currentPhoneEvidence.transform.SetParent(cameraTransform);
-
-        Debug.Log("[Act2Choice] 📱 Phone evidence displayed!");
     }
 
     void HidePhoneEvidence()
@@ -584,7 +542,6 @@ public class Act2ChoiceManager : MonoBehaviour
         {
             Destroy(currentPhoneEvidence);
             currentPhoneEvidence = null;
-            Debug.Log("[Act2Choice] 📱 Phone evidence hidden!");
         }
     }
 }

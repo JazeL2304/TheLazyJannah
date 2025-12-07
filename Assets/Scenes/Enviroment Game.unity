@@ -4606,10 +4606,11 @@ MonoBehaviour:
   badEndingPanel: {fileID: 1860286437}
   badEndingDisplayTime: 5
   loadAct3AfterLieDialogue: 1
-  delayBeforeAct3: 2
   loadingSceneName: LoadingScene
   act3Number: 3
   act3Day: 100
+  blackFadeImage: {fileID: 0}
+  fadeOutDuration: 0.8
   pauseAtLineIndex: 9
   cleanupManager: {fileID: 0}
 --- !u!4 &423845692
@@ -7934,6 +7935,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1825149285}
+    - targetCorrespondingSourceObject: {fileID: 2107409826236812522, guid: ded1dba4e620c934eb7ccc1dce06d5b3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1825149287}
   m_SourcePrefab: {fileID: 3150474306388093854, guid: ded1dba4e620c934eb7ccc1dce06d5b3,
     type: 3}
 --- !u!4 &753292884 stripped
@@ -11592,10 +11597,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73823adb90aefb147aebbf0b93ea0eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onlyInAct1: 1
+  startDisabled: 1
   gameOverPanel: {fileID: 1925431570}
   gameOverText: {fileID: 1136418198}
   restartText: {fileID: 550528357}
   currentCheckpoint: {fileID: 0}
+  detectionCooldown: 2
+  detectionSound: {fileID: 0}
 --- !u!4 &1298104877
 Transform:
   m_ObjectHideFlags: 0
@@ -16878,6 +16887,26 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 753292883}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1825149287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825149283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6b73bf85716a54d9c7be6a561087d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ambientSound: {fileID: 8300000, guid: 170514ce7d64f3e47beead94fbaa05a9, type: 3}
+  minDistance: 1
+  maxDistance: 5
+  maxVolume: 0.6
+  loopSound: 1
+  playOnStart: 1
+  showDebugGizmos: 1
+  gizmosColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1 &1830213355
 GameObject:
   m_ObjectHideFlags: 0
@@ -18714,6 +18743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6494d6664899bd441aa7aa2b0598eee5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onlyInAct1: 1
   happyEndingPanel: {fileID: 1740804674}
   mainMenuButton: {fileID: 1908706138}
   choicePanel: {fileID: 972988718}
@@ -18723,6 +18753,7 @@ MonoBehaviour:
   bapakNPC: {fileID: 1208887903}
   dialogueManager: {fileID: 1770258341}
   questManager: {fileID: 174869601}
+  stealthManager: {fileID: 0}
   showDialogueAfterChoice2: 1
   delayBeforeDialogue: 1
 --- !u!4 &2074416143
