@@ -189,20 +189,31 @@ public class EndingDialogueTrigger : MonoBehaviour
         // Delay sebentar biar ShowEndingCanvas kebaca dulu
         yield return new WaitForSeconds(1.5f);
 
-        // SET PROGRESS KE ACT & DAY BERIKUTNYA
+        // ✅ CRITICAL: SET & SAVE PROGRESS SEBELUM LOAD SCENE!
         if (GameProgressManager.Instance != null)
         {
             GameProgressManager.Instance.SetProgress(nextAct, nextDay);
-            Debug.Log($"[EndingTrigger] ✅ Progress set to ACT {nextAct} DAY {nextDay}");
+
+            // FORCE SAVE LAGI untuk memastikan!
+            PlayerPrefs.SetInt("CurrentAct", nextAct);
+            PlayerPrefs.SetInt("CurrentDay", nextDay);
+            PlayerPrefs.Save();
+
+            Debug.Log($"[EndingTrigger] ✅ Progress SAVED: ACT {nextAct} DAY {nextDay}");
+
+            // Verify save
+            int savedAct = PlayerPrefs.GetInt("CurrentAct", -1);
+            int savedDay = PlayerPrefs.GetInt("CurrentDay", -1);
+            Debug.Log($"[EndingTrigger] 🔍 Verification - Saved: ACT {savedAct} DAY {savedDay}");
         }
         else
         {
-            Debug.LogWarning("[EndingTrigger] ⚠️ GameProgressManager not found! Progress not saved.");
+            Debug.LogError("[EndingTrigger] ❌ GameProgressManager not found! Progress NOT saved!");
         }
 
         // LOAD LOADING SCENE
         yield return new WaitForSeconds(0.5f);
         Debug.Log($"[EndingTrigger] 🎮 Loading scene: {loadingSceneName}");
-        SceneManager.LoadScene(loadingSceneName);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(loadingSceneName);
     }
 }

@@ -28,17 +28,15 @@ public class GameProgressManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Cek apakah perlu reset
+            // CRITICAL: Load saved progress FIRST!
+            LoadProgress();
+
+            // OPTIONAL: Cek apakah perlu reset (HANYA untuk debug!)
             if (resetOnStart)
             {
+                Debug.LogWarning("[GameProgressManager] ⚠️ resetOnStart = TRUE! Progress will be reset!");
                 ResetProgress();
                 resetOnStart = false; // Auto uncheck setelah reset
-                Debug.Log("[GameProgressManager] 🔄 Progress reset to ACT 1 DAY 1");
-            }
-            else
-            {
-                // Load saved progress
-                LoadProgress();
             }
 
             Debug.Log($"[GameProgressManager] ✅ Initialized! ACT {currentAct} DAY {currentDay}");
@@ -49,7 +47,6 @@ public class GameProgressManager : MonoBehaviour
             Debug.Log("[GameProgressManager] ⚠️ Duplicate destroyed!");
         }
     }
-
     void Start()
     {
         UpdateUI();

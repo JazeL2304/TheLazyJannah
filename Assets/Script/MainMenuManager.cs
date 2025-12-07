@@ -15,11 +15,13 @@ public class MainMenuManager : MonoBehaviour
 
         Debug.Log("[MainMenu] Main Menu loaded - Cursor unlocked!");
 
-        // ✅ RESET PROGRESS KE ACT 1 (OPSIONAL - BISA DIATUR DI INSPECTOR)
-        if (resetProgressOnMainMenu && GameProgressManager.Instance != null)
+        // ❌ JANGAN RESET OTOMATIS! Cuma reset kalau user klik Start Game!
+        // User mungkin balik ke main menu dari in-game untuk setting, dll
+        if (resetProgressOnMainMenu)
         {
-            GameProgressManager.Instance.ResetProgress();
-            Debug.Log("[MainMenu] ✅ Progress reset to ACT 1 DAY 1!");
+            Debug.LogWarning("[MainMenu] ⚠️ resetProgressOnMainMenu = TRUE (not recommended!)");
+            // KOMENTAR BARIS INI AGAR TIDAK AUTO-RESET!
+            // GameProgressManager.Instance.ResetProgress();
         }
     }
 

@@ -86,8 +86,8 @@ public class Act2ChoiceManager : MonoBehaviour
     public string mainMenuSceneName = "Main Menu";
 
     [Header("🎬 BAD ENDING PANEL (ROUTE 2)")]
-    public GameObject badEndingPanel; // ← BARU - Canvas Act 2 End
-    public float badEndingDisplayTime = 5f; // ← BARU - Berapa lama canvas muncul
+    public GameObject badEndingPanel;
+    public float badEndingDisplayTime = 5f;
 
     [Header("⏭️ ACT 3 PROGRESSION (ROUTE 2)")]
     public bool loadAct3AfterLieDialogue = true;
@@ -95,6 +95,10 @@ public class Act2ChoiceManager : MonoBehaviour
     public string loadingSceneName = "LoadingScene";
     public int act3Number = 3;
     public int act3Day = 60;
+
+    [Header("🌑 BLACK FADE TRANSITION")]
+    public Image blackFadeImage; // Drag Image hitam fullscreen dari Canvas
+    public float fadeOutDuration = 1.5f; // Durasi fade ke hitam
 
     [Header("🧹 CLEANUP QUEST (ROUTE 1)")]
     public int pauseAtLineIndex = 9;
@@ -139,10 +143,18 @@ public class Act2ChoiceManager : MonoBehaviour
             goodEndingPanel.SetActive(false);
         }
 
-        // ← BARU - Hide bad ending panel
         if (badEndingPanel != null)
         {
             badEndingPanel.SetActive(false);
+        }
+
+        // Setup black fade image
+        if (blackFadeImage != null)
+        {
+            Color c = blackFadeImage.color;
+            c.a = 0f; // Start transparent
+            blackFadeImage.color = c;
+            blackFadeImage.gameObject.SetActive(true); // Keep active but transparent
         }
 
         if (cleanupManager == null)
@@ -359,7 +371,7 @@ public class Act2ChoiceManager : MonoBehaviour
         }
         else
         {
-            // ← BARU - ROUTE 2: Tampilkan Bad Ending Canvas dulu sebelum Act 3
+            // ROUTE 2: Tampilkan Bad Ending Canvas dulu sebelum Act 3
             ShowBadEndingCanvas();
         }
     }
@@ -386,7 +398,6 @@ public class Act2ChoiceManager : MonoBehaviour
         }
     }
 
-    // ← BARU - Function untuk tampilkan Bad Ending Canvas
     void ShowBadEndingCanvas()
     {
         Debug.Log("[Act2Choice] 🎬 SHOWING BAD ENDING CANVAS - ACT 2 END!");
@@ -396,11 +407,10 @@ public class Act2ChoiceManager : MonoBehaviour
             badEndingPanel.SetActive(true);
             Debug.Log("[Act2Choice] ✅ Bad Ending Canvas displayed!");
 
-            // Cursor tetap visible buat baca canvas
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // Setelah beberapa detik, lanjut ke Act 3
+            // Setelah beberapa detik, lanjut ke Act 3 dengan fade
             StartCoroutine(WaitThenPrepareAct3());
         }
         else
@@ -410,17 +420,59 @@ public class Act2ChoiceManager : MonoBehaviour
         }
     }
 
-    // ← BARU - Coroutine tunggu canvas, lalu ke Act 3
     IEnumerator WaitThenPrepareAct3()
     {
         Debug.Log($"[Act2Choice] Waiting {badEndingDisplayTime} seconds before Act 3...");
         yield return new WaitForSeconds(badEndingDisplayTime);
 
-        // Hide canvas
+        // FADE OUT BAD ENDING PANEL
         if (badEndingPanel != null)
         {
+            CanvasGroup canvasGroup = badEndingPanel.GetComponent<CanvasGroup>();
+
+            if (canvasGroup == null)
+            {
+                canvasGroup = badEndingPanel.AddComponent<CanvasGroup>();
+            }
+
+            float fadeTime = 1f;
+            float elapsed = 0f;
+
+            while (elapsed < fadeTime)
+            {
+                elapsed += Time.deltaTime;
+                canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / fadeTime);
+                yield return null;
+            }
+
             badEndingPanel.SetActive(false);
         }
+
+        // FADE TO BLACK SCREEN
+        if (blackFadeImage != null)
+        {
+            float elapsed = 0f;
+
+            while (elapsed < fadeOutDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeOutDuration);
+
+                Color c = blackFadeImage.color;
+                c.a = alpha;
+                blackFadeImage.color = c;
+
+                yield return null;
+            }
+
+            // Ensure fully black
+            Color finalColor = blackFadeImage.color;
+            finalColor.a = 1f;
+            blackFadeImage.color = finalColor;
+        }
+
+        // Delay tambahan di black screen
+        yield return new WaitForSeconds(0.5f);
 
         // Lanjut ke Act 3
         PrepareAct3Transition();
