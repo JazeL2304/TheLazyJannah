@@ -6,9 +6,9 @@ using System.Collections;
 public class Act3FightManager : MonoBehaviour
 {
     [Header("⚔️ FIGHT UI - MINIMAL")]
-    public GameObject fightUI; // Canvas fight (TRANSPARAN!)
-    public TextMeshProUGUI actionText; // Text feedback aksi
-    public TextMeshProUGUI controlHintText; // Hint kontrol (optional)
+    public GameObject fightUI;
+    public TextMeshProUGUI actionText;
+    public TextMeshProUGUI controlHintText;
 
     [Header("🎮 FIGHT CONTROLS")]
     public KeyCode attackKey = KeyCode.Space;
@@ -32,8 +32,8 @@ public class Act3FightManager : MonoBehaviour
     public float dodgeCooldown = 4f;
 
     [Header("🎭 ANIMATION REFERENCES")]
-    public Animator playerAnimator; // Player animator
-    public Animator enemyAnimator; // Enemy animator
+    public Animator playerAnimator;
+    public Animator enemyAnimator;
 
     [Header("🔊 SOUND EFFECTS")]
     public AudioClip attackSound;
@@ -53,24 +53,20 @@ public class Act3FightManager : MonoBehaviour
     public float shakeIntensity = 0.1f;
     public float shakeDuration = 0.2f;
 
-    // INTERNAL STATE
     private float playerCurrentHealth;
     private float enemyCurrentHealth;
     private bool isDefending = false;
     private bool isDodging = false;
     private bool fightActive = false;
 
-    // COOLDOWN TIMERS
     private float attackCooldownTimer = 0f;
     private float defendCooldownTimer = 0f;
     private float dodgeCooldownTimer = 0f;
     private float enemyAttackTimer = 0f;
 
-    // CAMERA
     private Camera mainCamera;
     private Vector3 originalCameraPos;
 
-    // ANIMATION PARAMETERS (Standard Mecanim)
     private const string ANIM_ATTACK = "Attack";
     private const string ANIM_DEFEND = "Defend";
     private const string ANIM_DODGE = "Dodge";
@@ -80,7 +76,6 @@ public class Act3FightManager : MonoBehaviour
 
     void Start()
     {
-        // Setup audio
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -88,14 +83,12 @@ public class Act3FightManager : MonoBehaviour
         }
         audioSource.playOnAwake = false;
 
-        // Setup camera
         mainCamera = Camera.main;
         if (mainCamera != null)
         {
             originalCameraPos = mainCamera.transform.localPosition;
         }
 
-        // Auto-detect animators
         if (playerAnimator == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -107,14 +100,13 @@ public class Act3FightManager : MonoBehaviour
 
         if (enemyAnimator == null)
         {
-            GameObject enemy = GameObject.Find("DebtCollector"); // Adjust nama
+            GameObject enemy = GameObject.Find("DebtCollector");
             if (enemy != null)
             {
                 enemyAnimator = enemy.GetComponentInChildren<Animator>();
             }
         }
 
-        // Hide UI
         if (fightUI != null) fightUI.SetActive(false);
         if (victoryPanel != null) victoryPanel.SetActive(false);
         if (defeatPanel != null) defeatPanel.SetActive(false);
@@ -126,12 +118,10 @@ public class Act3FightManager : MonoBehaviour
     {
         if (!fightActive) return;
 
-        // Update cooldowns
         if (attackCooldownTimer > 0) attackCooldownTimer -= Time.deltaTime;
         if (defendCooldownTimer > 0) defendCooldownTimer -= Time.deltaTime;
         if (dodgeCooldownTimer > 0) dodgeCooldownTimer -= Time.deltaTime;
 
-        // Player input
         if (Input.GetKeyDown(attackKey) && attackCooldownTimer <= 0)
         {
             PlayerAttack();
@@ -147,7 +137,6 @@ public class Act3FightManager : MonoBehaviour
             PlayerDodge();
         }
 
-        // Enemy attack timer
         enemyAttackTimer += Time.deltaTime;
         if (enemyAttackTimer >= enemyAttackInterval)
         {
@@ -155,11 +144,8 @@ public class Act3FightManager : MonoBehaviour
             enemyAttackTimer = 0f;
         }
 
-        // Reset defend state
         if (isDefending)
         {
-            // Defend hanya berlaku untuk 1 attack berikutnya
-            // Logic sudah handled di EnemyAttack()
         }
     }
 
@@ -167,27 +153,22 @@ public class Act3FightManager : MonoBehaviour
     {
         fightActive = true;
 
-        // Initialize health
         playerCurrentHealth = playerMaxHealth;
         enemyCurrentHealth = enemyMaxHealth;
 
-        // Show UI
         if (fightUI != null)
         {
             fightUI.SetActive(true);
         }
 
-        // Show control hint
         if (controlHintText != null)
         {
             controlHintText.text = "[SPACE] Attack | [SHIFT] Defend | [Q] Dodge";
         }
 
-        // Cursor control
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Disable player movement
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -198,7 +179,6 @@ public class Act3FightManager : MonoBehaviour
             }
         }
 
-        // Set animators to idle/combat stance
         if (playerAnimator != null)
         {
             playerAnimator.SetTrigger(ANIM_IDLE);
@@ -218,22 +198,18 @@ public class Act3FightManager : MonoBehaviour
     {
         attackCooldownTimer = attackCooldown;
 
-        // PLAY ANIMATION
         if (playerAnimator != null)
         {
             playerAnimator.SetTrigger(ANIM_ATTACK);
         }
 
-        // Deal damage
         enemyCurrentHealth -= playerAttackDamage;
 
-        // PLAY HIT ANIMATION ON ENEMY
         if (enemyAnimator != null)
         {
             enemyAnimator.SetTrigger(ANIM_HIT);
         }
 
-        // Sound & effects
         if (attackSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(attackSound);
@@ -256,7 +232,6 @@ public class Act3FightManager : MonoBehaviour
         defendCooldownTimer = defendCooldown;
         isDefending = true;
 
-        // PLAY ANIMATION
         if (playerAnimator != null)
         {
             playerAnimator.SetTrigger(ANIM_DEFEND);
@@ -271,7 +246,6 @@ public class Act3FightManager : MonoBehaviour
 
         Debug.Log("[Act3Fight] Player defending!");
 
-        // Reset defend after next attack atau timeout
         Invoke("ResetDefend", 2f);
     }
 
@@ -288,10 +262,8 @@ public class Act3FightManager : MonoBehaviour
 
         if (random <= dodgeChance)
         {
-            // Dodge successful
             isDodging = true;
 
-            // PLAY ANIMATION
             if (playerAnimator != null)
             {
                 playerAnimator.SetTrigger(ANIM_DODGE);
@@ -306,12 +278,10 @@ public class Act3FightManager : MonoBehaviour
 
             Debug.Log("[Act3Fight] Dodge successful!");
 
-            // Set window untuk dodge next attack
             Invoke("ResetDodge", 2f);
         }
         else
         {
-            // Dodge failed
             if (missSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(missSound);
@@ -330,13 +300,11 @@ public class Act3FightManager : MonoBehaviour
 
     void EnemyAttack()
     {
-        // PLAY ATTACK ANIMATION
         if (enemyAnimator != null)
         {
             enemyAnimator.SetTrigger(ANIM_ATTACK);
         }
 
-        // Check if player dodging
         if (isDodging)
         {
             ShowActionText("Enemy attack DODGED!", Color.green, 1.5f);
@@ -346,12 +314,11 @@ public class Act3FightManager : MonoBehaviour
 
         float damage = enemyAttackDamage;
 
-        // Check if player defending
         if (isDefending)
         {
             damage *= playerDefendReduction;
             ShowActionText($"Enemy attack BLOCKED! -{damage} HP", Color.cyan, 1.5f);
-            isDefending = false; // Consume defend
+            isDefending = false;
         }
         else
         {
@@ -360,7 +327,6 @@ public class Act3FightManager : MonoBehaviour
 
         playerCurrentHealth -= damage;
 
-        // PLAY HIT ANIMATION ON PLAYER
         if (playerAnimator != null)
         {
             playerAnimator.SetTrigger(ANIM_HIT);
@@ -397,7 +363,6 @@ public class Act3FightManager : MonoBehaviour
     {
         fightActive = false;
 
-        // PLAY DEATH ANIMATION ON ENEMY
         if (enemyAnimator != null)
         {
             enemyAnimator.SetTrigger(ANIM_DEATH);
@@ -424,7 +389,6 @@ public class Act3FightManager : MonoBehaviour
     {
         fightActive = false;
 
-        // PLAY DEATH ANIMATION ON PLAYER
         if (playerAnimator != null)
         {
             playerAnimator.SetTrigger(ANIM_DEATH);
@@ -450,6 +414,18 @@ public class Act3FightManager : MonoBehaviour
     void LoadNextScene()
     {
         Debug.Log("[Act3Fight] Loading: " + nextSceneName);
+
+        // ✅ RESET PROGRESS JIKA LOAD KE MAIN MENU!
+        if (nextSceneName == "Main Menu" && GameProgressManager.Instance != null)
+        {
+            GameProgressManager.Instance.ResetProgress();
+            Debug.Log("[Act3Fight] Progress reset to ACT 1!");
+        }
+
+        // Unlock cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
     }
 

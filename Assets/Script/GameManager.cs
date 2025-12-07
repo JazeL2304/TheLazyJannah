@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     public GameObject bapakNPC;
     public Dialogue dialogueManager;
     public QuestManager questManager;
-    public StealthManager stealthManager; // ← BARU!
+    public StealthManager stealthManager;
 
     [Header("Post-Choice 2 Settings")]
     public bool showDialogueAfterChoice2 = true;
@@ -295,7 +295,22 @@ public class GameManager : MonoBehaviour
     public void LoadMainMenu()
     {
         Debug.Log("[GameManager] Loading Main Menu...");
+
+        // ✅ RESET PROGRESS SEBELUM KE MAIN MENU!
+        if (GameProgressManager.Instance != null)
+        {
+            GameProgressManager.Instance.ResetProgress();
+            Debug.Log("[GameManager] Progress reset to ACT 1!");
+        }
+
+        // Unlock cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Reset time scale (kalau ada pause)
         Time.timeScale = 1;
+
+        // Load main menu scene
         SceneManager.LoadScene("Main Menu");
     }
 
