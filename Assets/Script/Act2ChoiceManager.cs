@@ -74,6 +74,20 @@ public class Act2ChoiceManager : MonoBehaviour
     public int showPhoneAtLineIndex = 1;
     private GameObject currentPhoneEvidence;
 
+    [Header("✨ PHONE VFX - VISUAL EFFECTS")]
+    public Image flashOverlay; // White flash effect
+    public Image vignetteOverlay; // Dark edges effect
+    public AudioClip phoneRevealSound; // Dramatic "DUN DUN" sound
+    public AudioClip shockSound; // Additional shock sound
+    public float flashDuration = 0.3f;
+    public float shakeDuration = 0.5f;
+    public float shakeIntensity = 0.15f;
+    public float popInDuration = 0.6f;
+    public float vignetteDuration = 0.5f;
+    public bool enableSlowMotion = false;
+    public float slowMotionScale = 0.3f;
+    public float slowMotionDuration = 1f;
+
     [Header("🎬 GOOD ENDING PANEL (ROUTE 1 ONLY)")]
     public GameObject goodEndingPanel;
 
@@ -87,17 +101,17 @@ public class Act2ChoiceManager : MonoBehaviour
 
     [Header("🎬 BAD ENDING PANEL (ROUTE 2)")]
     public GameObject badEndingPanel;
-    public float badEndingDisplayTime = 2f; // ← Dipercepat lagi!
+    public float badEndingDisplayTime = 2f;
 
     [Header("⏭️ ACT 3 PROGRESSION (ROUTE 2)")]
     public bool loadAct3AfterLieDialogue = true;
     public string loadingSceneName = "LoadingScene";
     public int act3Number = 3;
-    public int act3Day = 60; // ← CEK INI! Harusnya 60 bukan 100!
+    public int act3Day = 60;
 
     [Header("🌑 BLACK FADE TRANSITION")]
     public Image blackFadeImage;
-    public float fadeOutDuration = 0.8f; // ← Lebih cepat lagi!
+    public float fadeOutDuration = 0.8f;
 
     [Header("🧹 CLEANUP QUEST (ROUTE 1)")]
     public int pauseAtLineIndex = 9;
@@ -109,6 +123,7 @@ public class Act2ChoiceManager : MonoBehaviour
     private bool dialogueActive = false;
     private bool isHonestRoute = false;
     private bool isPausedForCleanup = false;
+    private Vector3 originalCameraPos;
 
     void Start()
     {
@@ -160,6 +175,17 @@ public class Act2ChoiceManager : MonoBehaviour
             Debug.LogWarning("[Act2Choice] ⚠️ Black Fade Image not assigned!");
         }
 
+        // ✅ SETUP VFX OVERLAYS
+        if (flashOverlay != null)
+        {
+            flashOverlay.gameObject.SetActive(false);
+        }
+
+        if (vignetteOverlay != null)
+        {
+            vignetteOverlay.gameObject.SetActive(false);
+        }
+
         if (cleanupManager == null)
         {
             cleanupManager = FindObjectOfType<TrashCleanupManager>();
@@ -170,7 +196,13 @@ public class Act2ChoiceManager : MonoBehaviour
             cameraTransform = Camera.main.transform;
         }
 
-        Debug.Log("[Act2Choice] Script initialized!");
+        // Save original camera position for shake
+        if (cameraTransform != null)
+        {
+            originalCameraPos = cameraTransform.localPosition;
+        }
+
+        Debug.Log("[Act2Choice] Script initialized with VFX support!");
     }
 
     void Update()
@@ -274,6 +306,7 @@ public class Act2ChoiceManager : MonoBehaviour
             dialogueNameText.text = currentLine.speaker;
         }
 
+        // ✅ TRIGGER PHONE VFX SAAT PAPA NUNJUKIN BUKTI!
         if (!isHonestRoute && currentDialogueLine == showPhoneAtLineIndex)
         {
             ShowPhoneEvidence();
@@ -377,31 +410,25 @@ public class Act2ChoiceManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // LANGSUNG KE FADE SEQUENCE - NO WAIT!
             StartCoroutine(InstantFadeToAct3());
         }
         else
         {
-            // Kalau ga ada panel, langsung fade aja
             StartCoroutine(DirectFadeToAct3());
         }
     }
 
-    // ✅ BARU - INSTANT FADE (Minimal delay!)
     IEnumerator InstantFadeToAct3()
     {
         Debug.Log("[Act2Choice] Starting instant fade sequence...");
 
-        // Tampilkan canvas sebentar (2 detik aja)
         yield return new WaitForSeconds(badEndingDisplayTime);
 
-        // INSTANT HIDE - Ga usah fade panel!
         if (badEndingPanel != null)
         {
             badEndingPanel.SetActive(false);
         }
 
-        // LANGSUNG FADE TO BLACK!
         if (blackFadeImage != null)
         {
             float elapsed = 0f;
@@ -418,7 +445,6 @@ public class Act2ChoiceManager : MonoBehaviour
                 yield return null;
             }
 
-            // Ensure fully black
             Color finalColor = blackFadeImage.color;
             finalColor.a = 1f;
             blackFadeImage.color = finalColor;
@@ -426,11 +452,9 @@ public class Act2ChoiceManager : MonoBehaviour
             Debug.Log("[Act2Choice] ✅ Screen BLACK - Loading Act 3 NOW!");
         }
 
-        // LANGSUNG LOAD - NO DELAY!
         PrepareAndLoadAct3();
     }
 
-    // ✅ BARU - Direct fade tanpa panel
     IEnumerator DirectFadeToAct3()
     {
         Debug.Log("[Act2Choice] Direct fade (no panel) - instant!");
@@ -459,17 +483,14 @@ public class Act2ChoiceManager : MonoBehaviour
         PrepareAndLoadAct3();
     }
 
-    // ✅ BARU - Instant prep & load (NO coroutine delays!)
     void PrepareAndLoadAct3()
     {
         Debug.Log("[Act2Choice] ⏭️ LOADING ACT 3 IMMEDIATELY!");
 
-        // SAVE PROGRESS
         if (GameProgressManager.Instance != null)
         {
             GameProgressManager.Instance.SetProgress(act3Number, act3Day);
 
-            // Double-save untuk memastikan!
             PlayerPrefs.SetInt("CurrentAct", act3Number);
             PlayerPrefs.SetInt("CurrentDay", act3Day);
             PlayerPrefs.Save();
@@ -477,13 +498,11 @@ public class Act2ChoiceManager : MonoBehaviour
             Debug.Log($"[Act2Choice] ✅ SAVED: ACT {act3Number} DAY {act3Day}");
         }
 
-        // STOP AUDIO
         if (audioSource != null)
         {
             audioSource.Stop();
         }
 
-        // LOAD SCENE - INSTANT!
         if (loadAct3AfterLieDialogue)
         {
             Debug.Log("[Act2Choice] 🎮 LOADING SCENE NOW!");
@@ -525,15 +544,194 @@ public class Act2ChoiceManager : MonoBehaviour
         return choiceShown;
     }
 
+    // ✅✅✅ ENHANCED PHONE EVIDENCE WITH DRAMATIC VFX! ✅✅✅
     void ShowPhoneEvidence()
     {
         if (phoneEvidencePrefab == null || cameraTransform == null) return;
+
+        Debug.Log("[Act2Choice] 📱 Showing phone evidence with VFX!");
 
         Vector3 spawnPosition = cameraTransform.position + cameraTransform.TransformDirection(phoneOffset);
         Quaternion spawnRotation = cameraTransform.rotation * Quaternion.Euler(phoneRotation);
 
         currentPhoneEvidence = Instantiate(phoneEvidencePrefab, spawnPosition, spawnRotation);
         currentPhoneEvidence.transform.SetParent(cameraTransform);
+        currentPhoneEvidence.transform.localScale = Vector3.zero; // Start invisible
+
+        // ✅ TRIGGER ALL VFX AT ONCE!
+        StartCoroutine(PhoneRevealVFXCombo());
+    }
+
+    // ✅ MAIN VFX COMBO - EXECUTE ALL EFFECTS!
+    IEnumerator PhoneRevealVFXCombo()
+    {
+        Debug.Log("[Act2Choice] ⚡ EXECUTING VFX COMBO!");
+
+        // 1️⃣ FLASH EFFECT
+        StartCoroutine(FlashEffect());
+
+        // 2️⃣ CAMERA SHAKE
+        StartCoroutine(CameraShake());
+
+        // 3️⃣ DRAMATIC SOUND
+        if (audioSource != null && phoneRevealSound != null)
+        {
+            audioSource.PlayOneShot(phoneRevealSound);
+        }
+
+        // Optional shock sound
+        if (shockSound != null)
+        {
+            yield return new WaitForSeconds(0.2f);
+            audioSource.PlayOneShot(shockSound);
+        }
+
+        // 4️⃣ SLOW MOTION (optional)
+        if (enableSlowMotion)
+        {
+            StartCoroutine(SlowMotionEffect());
+        }
+
+        // 5️⃣ PHONE POP-IN ANIMATION
+        StartCoroutine(PhonePopInAnimation());
+
+        // 6️⃣ VIGNETTE EFFECT (dark edges)
+        StartCoroutine(VignetteEffect());
+
+        yield return null;
+    }
+
+    // 🎆 FLASH EFFECT - White screen flash
+    IEnumerator FlashEffect()
+    {
+        if (flashOverlay == null) yield break;
+
+        Debug.Log("[VFX] Flash effect!");
+
+        flashOverlay.gameObject.SetActive(true);
+        Color c = flashOverlay.color;
+        c.a = 0f;
+        flashOverlay.color = c;
+
+        // Flash IN (quickly)
+        float elapsed = 0f;
+        while (elapsed < flashDuration / 2)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(0f, 0.9f, elapsed / (flashDuration / 2));
+            c.a = alpha;
+            flashOverlay.color = c;
+            yield return null;
+        }
+
+        // Flash OUT (quickly)
+        elapsed = 0f;
+        while (elapsed < flashDuration / 2)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(0.9f, 0f, elapsed / (flashDuration / 2));
+            c.a = alpha;
+            flashOverlay.color = c;
+            yield return null;
+        }
+
+        flashOverlay.gameObject.SetActive(false);
+    }
+
+    // 📷 CAMERA SHAKE - Screen shake effect
+    IEnumerator CameraShake()
+    {
+        if (cameraTransform == null) yield break;
+
+        Debug.Log("[VFX] Camera shake!");
+
+        float elapsed = 0f;
+
+        while (elapsed < shakeDuration)
+        {
+            float x = Random.Range(-1f, 1f) * shakeIntensity;
+            float y = Random.Range(-1f, 1f) * shakeIntensity;
+
+            cameraTransform.localPosition = originalCameraPos + new Vector3(x, y, 0);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Reset to original position
+        cameraTransform.localPosition = originalCameraPos;
+    }
+
+    // ⏱️ SLOW MOTION EFFECT
+    IEnumerator SlowMotionEffect()
+    {
+        Debug.Log("[VFX] Slow motion!");
+
+        Time.timeScale = slowMotionScale;
+        yield return new WaitForSecondsRealtime(slowMotionDuration);
+        Time.timeScale = 1f;
+    }
+
+    // 📱 PHONE POP-IN ANIMATION - Elastic bounce
+    IEnumerator PhonePopInAnimation()
+    {
+        if (currentPhoneEvidence == null) yield break;
+
+        Debug.Log("[VFX] Phone pop-in animation!");
+
+        float elapsed = 0f;
+        Vector3 targetScale = Vector3.one;
+
+        while (elapsed < popInDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / popInDuration;
+
+            // Elastic easing for bounce effect
+            float scale = ElasticEaseOut(t);
+            currentPhoneEvidence.transform.localScale = targetScale * scale;
+
+            yield return null;
+        }
+
+        currentPhoneEvidence.transform.localScale = targetScale;
+    }
+
+    // 🎨 ELASTIC EASING FUNCTION
+    float ElasticEaseOut(float t)
+    {
+        if (t == 0 || t == 1) return t;
+
+        float p = 0.3f;
+        float s = p / 4f;
+
+        return Mathf.Pow(2f, -10f * t) * Mathf.Sin((t - s) * (2f * Mathf.PI) / p) + 1f;
+    }
+
+    // 🌑 VIGNETTE EFFECT - Dark edges
+    IEnumerator VignetteEffect()
+    {
+        if (vignetteOverlay == null) yield break;
+
+        Debug.Log("[VFX] Vignette effect!");
+
+        vignetteOverlay.gameObject.SetActive(true);
+        Color c = vignetteOverlay.color;
+        c.a = 0f;
+        vignetteOverlay.color = c;
+
+        // Fade in vignette
+        float elapsed = 0f;
+        while (elapsed < vignetteDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(0f, 0.7f, elapsed / vignetteDuration);
+            c.a = alpha;
+            vignetteOverlay.color = c;
+            yield return null;
+        }
+
+        // Keep vignette active until phone is hidden
     }
 
     void HidePhoneEvidence()
@@ -543,5 +741,13 @@ public class Act2ChoiceManager : MonoBehaviour
             Destroy(currentPhoneEvidence);
             currentPhoneEvidence = null;
         }
+
+        // ✅ ALSO HIDE VIGNETTE
+        if (vignetteOverlay != null)
+        {
+            vignetteOverlay.gameObject.SetActive(false);
+        }
+
+        Debug.Log("[Act2Choice] Phone evidence hidden + VFX cleaned up!");
     }
 }

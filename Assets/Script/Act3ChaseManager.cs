@@ -52,6 +52,13 @@ public class Act3ChaseManager : MonoBehaviour
     public AudioClip chaseMusic;
     private AudioSource audioSource;
 
+    [Header("🎭 ANIMATION")]
+    public string walkAnimationName = "Run"; // Nama animasi jalan (sesuaikan dengan nama di asset)
+    public string idleAnimationName = "Idle"; // Nama animasi idle
+    public bool useAnimatorParameter = true; // Gunakan parameter animator?
+    public string speedParameterName = "Speed"; // Nama parameter speed di animator
+    private Animator punkAnimator;
+
     [Header("⚙️ CHASE STATE")]
     private bool isChasing = false;
     private bool isCaught = false;
@@ -71,6 +78,20 @@ public class Act3ChaseManager : MonoBehaviour
         if (player == null)
         {
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        }
+
+        // Get Animator dari Punk NPC
+        if (debtCollectorNPC != null)
+        {
+            punkAnimator = debtCollectorNPC.GetComponent<Animator>();
+            if (punkAnimator == null)
+            {
+                Debug.LogWarning("[Act3Chase] ⚠️ Animator tidak ditemukan pada Punk NPC!");
+            }
+            else
+            {
+                Debug.Log("[Act3Chase] ✅ Animator ditemukan pada Punk NPC!");
+            }
         }
 
         if (dialogueBox != null)
@@ -168,6 +189,9 @@ public class Act3ChaseManager : MonoBehaviour
         // Show objective panel
         ShowObjective();
 
+        // Play walk animation
+        PlayWalkAnimation();
+
         // Play chase music
         if (chaseMusic != null && audioSource != null)
         {
@@ -187,6 +211,9 @@ public class Act3ChaseManager : MonoBehaviour
         isChasing = false;
 
         Debug.Log("[Act3Chase] 😱 PLAYER CAUGHT!");
+
+        // Stop walk animation, play idle
+        PlayIdleAnimation();
 
         // Hide objective panel
         if (objectivePanel != null)
@@ -218,6 +245,52 @@ public class Act3ChaseManager : MonoBehaviour
 
         // Start caught dialogue
         StartCaughtDialogue();
+    }
+
+    void PlayWalkAnimation()
+    {
+        if (punkAnimator != null)
+        {
+            if (useAnimatorParameter && !string.IsNullOrEmpty(speedParameterName))
+            {
+                // Gunakan parameter (untuk Animator Controller dengan blend tree)
+                punkAnimator.SetFloat(speedParameterName, chaseSpeed);
+                Debug.Log($"[Act3Chase] 🚶 Setting animator parameter '{speedParameterName}' to {chaseSpeed}");
+            }
+            else
+            {
+                // Langsung play animasi
+                punkAnimator.Play(walkAnimationName);
+                Debug.Log($"[Act3Chase] 🚶 Playing walk animation: {walkAnimationName}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Act3Chase] ⚠️ Punk Animator is null!");
+        }
+    }
+
+    void PlayIdleAnimation()
+    {
+        if (punkAnimator != null)
+        {
+            if (useAnimatorParameter && !string.IsNullOrEmpty(speedParameterName))
+            {
+                // Set speed ke 0 untuk idle
+                punkAnimator.SetFloat(speedParameterName, 0f);
+                Debug.Log($"[Act3Chase] 🧍 Setting animator parameter '{speedParameterName}' to 0 (idle)");
+            }
+            else
+            {
+                // Langsung play idle
+                punkAnimator.Play(idleAnimationName);
+                Debug.Log($"[Act3Chase] 🧍 Playing idle animation: {idleAnimationName}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Act3Chase] ⚠️ Punk Animator is null!");
+        }
     }
 
     void StartCaughtDialogue()
@@ -347,4 +420,4 @@ public class Act3ChaseManager : MonoBehaviour
     {
         return isCaught;
     }
-}
+}   
