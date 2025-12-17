@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
@@ -11,6 +11,12 @@ public class QuestManager : MonoBehaviour
 
     [Header("Quest Settings")]
     public Quest[] quests;
+
+    [Header("Persistent Objective")]
+    [Tooltip("Index objective yang selalu muncul (misal: 4 untuk objective terakhir)")]
+    public int persistentObjectiveIndex = 4;
+    [Tooltip("Aktifkan persistent objective?")]
+    public bool showPersistentObjective = true;
 
     private int currentQuestIndex = 0;
     private int currentObjectiveIndex = 0;
@@ -65,6 +71,15 @@ public class QuestManager : MonoBehaviour
 
             currentObjectiveIndex++;
 
+            // Jika sudah sampai di objective terakhir sebelum persistent objective
+            // maka complete juga persistent objective
+            if (currentObjectiveIndex == persistentObjectiveIndex && showPersistentObjective)
+            {
+                currentQuest.objectives[persistentObjectiveIndex].isCompleted = true;
+                Debug.Log("Persistent objective selesai: " + currentQuest.objectives[persistentObjectiveIndex].description);
+                currentObjectiveIndex++;
+            }
+
             if (currentObjectiveIndex >= currentQuest.objectives.Length)
             {
                 CompleteQuest();
@@ -97,7 +112,20 @@ public class QuestManager : MonoBehaviour
 
         if (questDescriptionText != null && currentObjectiveIndex < currentQuest.objectives.Length)
         {
-            questDescriptionText.text = "� " + currentQuest.objectives[currentObjectiveIndex].description;
+            string objectivesText = "";
+
+            // Tampilkan objective saat ini
+            objectivesText = "• " + currentQuest.objectives[currentObjectiveIndex].description;
+
+            // Tambahkan persistent objective jika aktif dan bukan objective saat ini
+            if (showPersistentObjective &&
+                persistentObjectiveIndex < currentQuest.objectives.Length &&
+                currentObjectiveIndex != persistentObjectiveIndex)
+            {
+                objectivesText += "\n• " + currentQuest.objectives[persistentObjectiveIndex].description;
+            }
+
+            questDescriptionText.text = objectivesText;
         }
     }
 
